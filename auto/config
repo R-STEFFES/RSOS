@@ -20,6 +20,21 @@ DATE="$(date -u +%Y%m%d)"
 # Volumenname der ISO: Punkte sind dort nicht ueblich, also 2.0 -> 2_0
 VOLUME="RSOS$(printf '%s' "${VERSION}" | tr '.' '_')"
 
+# Squashfs-Kompression. Vorgabe ist xz -- kleinste ISO, aber langsam und
+# speicherhungrig: mksquashfs laeuft mit allen Kernen und grossen
+# Woerterbuechern, das bringt kleine Bau-VMs zum Absturz. Ueber die
+# Umgebungsvariable RSOS_SQUASHFS laesst sich das umstellen, ohne die Vorgabe
+# zu aendern:
+#
+#     RSOS_SQUASHFS=zstd ./scripts/container/build.sh --keep
+#
+# zstd ist ein Vielfaches schneller und braucht einen Bruchteil des Speichers,
+# die ISO wird dafuer rund 10 Prozent groesser. gzip liegt dazwischen.
+SQUASHFS_ARGS=""
+if [ -n "${RSOS_SQUASHFS:-}" ]; then
+	SQUASHFS_ARGS="--chroot-squashfs-compression-type ${RSOS_SQUASHFS}"
+fi
+
 lb config noauto \
 	--mode debian \
 	--distribution trixie \
@@ -39,11 +54,12 @@ lb config noauto \
 	--firmware-binary true \
 	--firmware-chroot true \
 	--win32-loader false \
-	--image-name "${NAME}-${DATE}-amd64" \
+	--image-name "${NAME}-${DATE}" \
 	--iso-application "${NAME}" \
 	--iso-preparer "Steffes Industries <https://steffes.industries/>" \
 	--iso-publisher "Steffes Industries <https://steffes.industries/>" \
 	--iso-volume "${VOLUME}" \
 	--bootappend-live "boot=live components username=rsos hostname=rsos locales=de_DE.UTF-8 keyboard-layouts=de keyboard-model=pc105 timezone=Europe/Berlin quiet splash" \
 	--checksums sha512 \
+	${SQUASHFS_ARGS} \
 	--color

@@ -59,17 +59,54 @@ cd ~/Schreibtisch/RSOS
 ```
 
 Das Image (`scripts/container/Dockerfile`) ist Debian 13 mit den offiziellen
-Bauwerkzeugen. Der Quellordner wird hereingemountet, gebaut wird drinnen. Der
-Container hat root, der Wirtsrechner nicht.
+Bauwerkzeugen. Der Container hat root, der Wirtsrechner nicht.
 
 Der Container läuft bewusst mit `--privileged`: live-build mountet im Chroot
 `/proc`, `/sys` und `/dev` und legt dort Gerätedateien an — ohne
 `CAP_SYS_ADMIN` bricht der Bau beim ersten Chroot-Schritt ab. Der Container ist
-wegwerfbar und sieht nichts außer dem hereingebundenen Projektordner.
+wegwerfbar.
 
-Auf diesem Rechner ist der Weg der bequemste, wenn Docker Desktop läuft: der
-Bau läuft dann komplett ohne Passwort ab. Ohne laufenden Daemon hilft nur
-Weg 1 (mit `sudo`) oder Weg 4 (GitHub Actions).
+**Gebaut wird in einem Docker-Volume, nicht im hereingebundenen Projektordner.**
+Docker Desktop reicht Bind-Mounts aus dem Heimatverzeichnis über virtiofs
+herein; im Container erscheinen sie als Dateisystem `fakeowner`, und das kann
+nicht, was `debootstrap` beim Auspacken braucht:
+
+```
+E: Tried to extract package, but tar failed. Exit...
+```
+
+Gegenprobe mit demselben Container: `debootstrap` auf `fakeowner` bricht beim
+allerersten Paket ab, in einem nativen Volume (ext4) läuft es durch
+(`rc=0`, Debian 13.7, Chroot startet). Das Skript kopiert die Quellen deshalb
+ins Volume, baut dort und holt `out/` und `build.log` per tar-Pipeline heraus —
+dadurch gehören die Dateien dem angemeldeten Benutzer und nicht `root`.
+
+Optionen:
+
+| Aufruf | Wirkung |
+|---|---|
+| `./scripts/container/build.sh` | frischer Bau (Arbeitsvolume wird neu angelegt) |
+| `... --keep` | Arbeitsvolume behalten — zweiter Lauf spart Bootstrap und Pakete |
+| `... --shell` | Shell im Container, Projektordner lesend unter `/src` |
+| `... --clean` | Arbeitsvolume wegwerfen |
+
+### Squashfs-Kompression
+
+Vorgabe ist `xz`: kleinste ISO, aber langsam und speicherhungrig — `mksquashfs`
+läuft mit allen Kernen und großen Wörterbüchern. Auf diesem Rechner hat das die
+Docker-VM umgebracht (24 GB VM auf einem 31-GB-Wirt, dazu der Seiten-Cache der
+800 MB großen Chroot: der Swap des Wirts lief voll, die VM brach mit
+`error waiting for container: unexpected EOF` ab).
+
+Umschalten über eine Umgebungsvariable, ohne die Vorgabe zu ändern:
+
+```bash
+RSOS_SQUASHFS=zstd ./scripts/container/build.sh
+```
+
+`zstd` ist ein Vielfaches schneller und braucht einen Bruchteil des Speichers,
+die ISO wird dafür rund 10 Prozent größer (gemessen: 3,3 GB mit `zstd`).
+`gzip` liegt dazwischen. Das Ergebnis ist in jedem Fall bootfähig.
 
 Vorteil: reproduzierbar, gleiche Werkzeugversionen auf jedem Rechner.
 Nachteil: braucht einen laufenden Docker-Daemon.
@@ -187,14 +224,15 @@ Baus dasselbe, nur automatisch.
 ```
 /                     ISO-Wurzel
 ├── live/
-│   ├── vmlinuz           Kernel
-│   ├── initrd.img        Initramfs mit live-boot
-│   └── filesystem.squashfs   das komplette System, xz-komprimiert
-├── boot/
-│   ├── grub/             GRUB für BIOS und EFI
-│   └── isolinux/         BIOS-Bootmenü (nur wenn syslinux gewählt)
-├── .disk/info            Datenträgerkennung
-└── md5sum.txt            Prüfsummen
+│   ├── vmlinuz                Kernel 6.12 (amd64)
+│   ├── initrd.img             Initramfs mit live-boot
+│   ├── filesystem.squashfs    das komplette System, zstd-komprimiert
+│   └── filesystem.packages    Paketliste der Live-Sitzung
+├── isolinux/                  BIOS-Bootmenü (isolinux.bin, isolinux.cfg, boot.cat)
+├── EFI/boot/                  UEFI: bootx64.efi, grubx64.efi
+├── boot/grub/                 GRUB-Konfiguration
+├── .disk/info                 Datenträgerkennung
+└── sha512sum.txt              Prüfsummen
 ```
 
 ---
@@ -204,12 +242,13 @@ Baus dasselbe, nur automatisch.
 | Symptom | Ursache | Abhilfe |
 |---|---|---|
 | `lb: command not found` | live-build fehlt | `sudo apt install live-build` oder `scripts/toolchain.sh` |
-| `debootstrap` bricht mit `tar failed` ab | gid-Mapping (siehe oben) | `TAR_OPTIONS=--no-same-owner` oder mit root bauen |
+| `debootstrap` bricht mit `tar failed` ab | gid-Mapping (rootless) **oder** Bind-Mount statt Volume (Container) | `TAR_OPTIONS=--no-same-owner` bzw. Weg 2 mit Arbeitsvolume |
 | `newuidmap ... Operation not permitted` | Sandkasten/Container ohne Rechte | Weg 1 oder 2 nehmen |
+| `error waiting for container: unexpected EOF` | Docker-VM gestorben, meist Speicher (Squashfs mit xz) | `RSOS_SQUASHFS=zstd`, VM-Speicher senken, Anwendungen schließen |
 | Abbruch bei `apt-get install` im Chroot | Netz oder Paketname falsch | `scripts/check-packages.sh` prüfen lassen |
 | ISO startet nicht im UEFI | `grub-efi`-Teil fehlt | `--bootloaders "grub-efi"` in `auto/config` prüfen |
 | Bau bleibt bei „Mounting /proc" hängen | alter Chroot noch gemountet | `sudo lb clean`, dann erneut |
-| Kein Platz mehr | ~9 GB pro Bau | `sudo lb clean --purge`, `out/` leeren |
+| Kein Platz mehr | ~12 GB pro Bau | `./scripts/container/build.sh --clean`, `out/` leeren |
 
 ---
 
@@ -233,12 +272,38 @@ für deinen Rechner braucht es keine.
 
 ## Stand
 
-* Die Konfiguration ist vollständig, aber **noch nicht gebaut**.
-* Alle 220 Paketnamen sind gegen den trixie-Index geprüft
-  (`scripts/check-packages.sh`): alle vorhanden. Entfernt wurden nur
-  `zulucrypt-gui`/`zulumount-gui`, die es in trixie nicht mehr gibt.
-* Der rootless-Weg ist auf diesem Rechner bis zur Paket-Extraktion geprüft und
-  scheitert dort an den GIDs (siehe oben) — er ist dokumentiert, aber nicht der
-  empfohlene Weg.
-* Ein vollständiger Bau mit ISO ist noch nicht gelaufen. Der erste Bau braucht
-  `sudo` (Weg 1) oder den Container (Weg 2).
+**RSOS 2.0 „Janina" ist gebaut** (2026-11-09). Die ISO liegt in `out/` und
+zusätzlich in `~/Downloads`:
+
+```
+RSOS-2.0-Janina-20261109-amd64.hybrid.iso    3,3 GB
+```
+
+Gebaut im Container (Weg 2) mit `RSOS_SQUASHFS=zstd`. Geprüft wurde:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Boot-Struktur | isohybrid-MBR, El-Torito, EFI-Image (`/EFI/boot/bootx64.efi`) |
+| Kernel / Initramfs | `/live/vmlinuz`, `/live/initrd.img` (6.12.116+deb13-amd64) |
+| Squashfs | 3,1 GB, Kompression **zstd** |
+| Prüfsumme | `sha512sum.txt` der ISO stimmt mit dem nachgerechneten Wert überein |
+| Branding | `PRETTY_NAME="RSOS 2.0 Janina"`, `ID=rsos`, `/etc/rsos-codename` = Janina |
+
+Noch offen:
+
+* **Ein Live-Start in einer VM ist noch nicht gelaufen.** Geprüft ist bisher
+  nur der Aufbau der ISO, nicht die laufende Sitzung.
+* Plasma-Layout: `scripts/capture-kde-config.sh` muss noch von einem
+  Referenzlauf abgezogen werden.
+* Hardware-Mindestanforderungen im Calamares stehen noch auf den Werten der
+  1.x-Reihe.
+* Die ISO ist mit `zstd` 3,3 GB groß. Mit `xz` wären es rund 10 Prozent
+  weniger — auf diesem Rechner aber nur mit mehr Speicher für die Docker-VM.
+
+Alle 220 Paketnamen sind gegen den trixie-Index geprüft
+(`scripts/check-packages.sh`): alle vorhanden. Entfernt wurden nur
+`zulucrypt-gui`/`zulumount-gui`, die es in trixie nicht mehr gibt.
+
+Der rootless-Weg ist auf diesem Rechner bis zur Paket-Extraktion geprüft und
+scheitert dort an den GIDs (siehe oben) — er ist dokumentiert, aber nicht der
+empfohlene Weg.

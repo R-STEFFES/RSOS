@@ -83,8 +83,11 @@ echo "==> Quellen ins Arbeitsvolume kopieren"
 	"$IMAGE" /bin/sh -c 'cp -a /src/. /work/ && rm -rf /work/.git'
 
 echo "==> Build im Volume -- das dauert 25 bis 45 Minuten"
+if [ -n "${RSOS_SQUASHFS:-}" ]; then
+	echo "    Squashfs-Kompression: ${RSOS_SQUASHFS} (Vorgabe waere xz)"
+fi
 rc=0
-"$ENGINE" run --rm --privileged -v "$VOL":/work -w /work \
+"$ENGINE" run --rm --privileged -e RSOS_SQUASHFS -v "$VOL":/work -w /work \
 	"$IMAGE" /bin/bash -c 'export LC_ALL=C.UTF-8; lb build' || rc=$?
 
 # Ergebnis heraus kopieren -- ueber eine tar-Pipeline, damit die Dateien auf dem
