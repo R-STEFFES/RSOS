@@ -1,6 +1,8 @@
 #!/bin/sh
 # RSOS -- Bauen.
-# Wird von `lb build` aufgerufen. Laeuft im Projektwurzelverzeichnis.
+#
+# Wird von `lb build` aufgerufen (live-build laeuft ueber auto/build).
+# Laeuft im Projektwurzelverzeichnis.
 
 set -e
 
@@ -10,11 +12,22 @@ VERSION="$(cat VERSION)"
 NAME="RSOS-${VERSION}"
 DATE="$(date -u +%Y%m%d)"
 
-# Volle Ausgabe mitschreiben -- ein ISO-Bau laeuft 20-60 Minuten, im Fehlerfall
-# ist build.log die einzige Spur.
-exec 2>&1 | tee "build.log"
+# Ausgabe gleichzeitig auf den Bildschirm und in build.log -- ein Bau laeuft
+# 20 bis 60 Minuten, im Fehlerfall ist build.log die einzige Spur.
+#
+# Der Exit-Code kommt ueber eine Statusdatei, weil eine Pipeline unter POSIX-sh
+# sonst nur den Code von `tee` liefert und ein Fehler unbemerkt bliebe.
+rm -f .lb-status
+( lb build noauto 2>&1; echo $? > .lb-status ) | tee build.log
+rc="$(cat .lb-status 2>/dev/null || echo 1)"
+rm -f .lb-status
 
-lb build
+if [ "${rc}" -ne 0 ]; then
+	echo
+	echo "Bau fehlgeschlagen (Code ${rc}). Ende von build.log:" >&2
+	tail -30 build.log >&2
+	exit "${rc}"
+fi
 
 # Ergebnis einsammeln
 mkdir -p out

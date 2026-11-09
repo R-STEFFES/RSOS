@@ -10,4 +10,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-lb clean "$@"
+# "noauto" verhindert, dass lb clean dieses Skript erneut aufruft.
+lb clean noauto "$@"
