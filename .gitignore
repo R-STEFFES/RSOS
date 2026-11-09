@@ -43,6 +43,10 @@
 /rootfs/
 /isoroot/
 
+# live-build erzeugt sich diese Paketliste selbst (live-boot, live-config,
+# live-config-systemd, systemd-sysv) -- nicht ins Repo.
+/config/package-lists/live.list.chroot
+
 # live-build verlinkt seine Standardhooks bei jedem `lb config` selbst nach
 # config/hooks/ -- absolut auf /usr/share/live/build/hooks. Abschaltbar ist das
 # nicht. Unsere eigenen Haken liegen in config/hooks/normal/ und sind durchweg
