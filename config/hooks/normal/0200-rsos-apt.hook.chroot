@@ -1,0 +1,36 @@
+#!/bin/sh
+# RSOS 2.0 -- Paketquellen im Chroot
+#
+# Im Image stehen ausschliesslich die originalen Debian-Quellen, damit ein
+# installiertes RSOS weiterhin normal versorgt wird. Backports sind dabei,
+# damit der Nutzer spaeter neuere Kernel nachziehen kann.
+
+set -e
+
+cat > /etc/apt/sources.list <<'EOF'
+# RSOS 2.0 -- originale Debian-Quellen, keine eigenen Repos
+deb http://deb.debian.org/debian/ trixie main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian/ trixie-updates main contrib non-free non-free-firmware
+deb http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+
+# Backports (neuere Kernel und Treiber, auf Wunsch)
+deb http://deb.debian.org/debian/ trixie-backports main contrib non-free non-free-firmware
+EOF
+
+# Live-Build legt eine eigene Quellenliste an -- die wuerde beim Installieren
+# mitkopiert und auf die Live-Medien zeigen. Weg damit.
+rm -f /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
+
+# CD-ROM-Quelle auskommentieren, falls debian-cd sie angelegt hat
+sed -i -e 's|^deb cdrom:|# deb cdrom:|' /etc/apt/sources.list 2>/dev/null || true
+
+# Backports nur auf Zuruf installieren, nicht automatisch
+cat > /etc/apt/preferences.d/rsos-backports <<'EOF'
+Package: *
+Pin: release a=trixie-backports
+Pin-Priority: 100
+EOF
+
+apt-get update >/dev/null 2>&1 || true
+
+exit 0

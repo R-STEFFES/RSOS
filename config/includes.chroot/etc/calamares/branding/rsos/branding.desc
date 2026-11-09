@@ -1,0 +1,28 @@
+---
+componentName:   rsos
+welcomeStyleCalamares: true
+
+strings:
+    productName:         RSOS
+    shortProductName:    RSOS
+    version:             2.0
+    shortVersion:        2.0
+    versionedName:       RSOS
+    shortVersionedName:  RSOS
+    bootloaderEntryName: rsos
+    productUrl:          https://steffes.industries/
+ 
+
+images:
+    productLogo:         "sti-logo.png"
+    productIcon:         "sti-logo.png"
+    productWallpaper:    "wallpaper.png"
+    productWelcome:      "slide_cs.png"
+
+slideshow:               "show.qml"
+
+style:
+   sidebarBackground:    "#292F34"
+   sidebarText:          "#FFFFFF"
+   sidebarTextSelect:    "#292F34"
+   sidebarTextHighlight: "#00E5FF"

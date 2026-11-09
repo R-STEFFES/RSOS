@@ -1,0 +1,56 @@
+#!/bin/sh
+# RSOS 2.0 -- Branding im Chroot
+#
+# Setzt die Kennung des Systems. Debian bleibt die Basis und wird auch so
+# ausgewiesen (ID_LIKE=debian), damit Debian-Pakete und Calamares weiter
+# wissen, woran sie sind.
+
+set -e
+
+VERSION="$(cat /etc/rsos-version 2>/dev/null || echo 2.0)"
+
+# --- os-release ------------------------------------------------------------
+cat > /etc/os-release <<EOF
+PRETTY_NAME="RSOS ${VERSION}"
+NAME="RSOS"
+VERSION_ID="${VERSION}"
+VERSION="${VERSION}"
+VERSION_CODENAME=trixie
+ID=rsos
+ID_LIKE=debian
+HOME_URL="https://steffes.industries/"
+SUPPORT_URL="https://steffes.industries/"
+BUG_REPORT_URL="https://steffes.industries/"
+EOF
+
+ln -sf ../usr/lib/os-release /etc/os-release
+
+# --- lsb-release (fuer Calamares und Skripte) ------------------------------
+if [ -e /etc/lsb-release ]; then
+	cat > /etc/lsb-release <<EOF
+DISTRIB_ID=RSOS
+DISTRIB_RELEASE=${VERSION}
+DISTRIB_CODENAME=trixie
+DISTRIB_DESCRIPTION="RSOS ${VERSION}"
+EOF
+fi
+
+# --- Grußtexte -------------------------------------------------------------
+printf '\nRSOS %s -- Debian GNU/Linux 13 (trixie) -- https://steffes.industries/\n\n' "${VERSION}" > /etc/issue
+cp /etc/issue /etc/issue.net
+
+cat > /etc/motd <<EOF
+
+  RSOS ${VERSION}
+  Steffes Industries -- https://steffes.industries/
+
+  Installieren:  "install-debian" im Anwendungsmenue oder Calamares starten
+  Pakete:        sudo apt update && sudo apt install <paket>
+
+EOF
+
+# --- Standard-Hostname der Live-Sitzung ------------------------------------
+echo "rsos" > /etc/hostname
+printf '127.0.0.1\tlocalhost\n127.0.1.1\trsos\n::1\t\tlocalhost ip6-localhost ip6-loopback\n' > /etc/hosts
+
+exit 0

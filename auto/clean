@@ -1,0 +1,13 @@
+#!/bin/sh
+# RSOS -- Aufraeumen.
+# `lb clean` entfernt chroot/, binary/ und cache/; mit --purge zusaetzlich
+# die heruntergeladenen Pakete im Cache (dann laedt der naechste Bau alles neu).
+#
+#   sudo ./auto/clean          -> Arbeitverzeichnisse weg
+#   sudo ./auto/clean --purge  -> komplette Neuladung erzwingen
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+lb clean "$@"

@@ -1,0 +1,16 @@
+# RSOS 2.0 -- Bootloader fuer die Binary-Stufe
+#
+# Diese Pakete landen nicht im Chroot, sondern werden gebraucht, um auf der
+# ISO ein bootfaehiges EFI-Image und den BIOS-Bootloader zu erzeugen
+# (UEFI mit Secure-Boot-Kette ueber shim).
+
+efibootmgr
+grub-common
+grub2-common
+grub-efi-amd64-bin
+grub-efi-ia32-bin
+grub-pc-bin
+mokutil
+shim-helpers-amd64-signed
+shim-signed
+shim-signed-common

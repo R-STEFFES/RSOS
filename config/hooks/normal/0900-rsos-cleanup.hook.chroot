@@ -1,0 +1,28 @@
+#!/bin/sh
+# RSOS 2.0 -- Aufraeumen vor dem Packen
+#
+# Alles, was nur waehrend des Baus gebraucht wurde, kommt raus. Das haelt das
+# Squashfs klein und verhindert, dass Rechnerkennungen oder Schluessel aus der
+# Bauumgebung mit auf die ISO wandern.
+
+set -e
+
+# Paketlisten und Cache
+apt-get -y autoremove --purge >/dev/null 2>&1 || true
+apt-get -y clean >/dev/null 2>&1 || true
+rm -rf /var/lib/apt/lists/*
+rm -rf /var/cache/apt/archives/*.deb
+
+# Rechnerkennung und Schluessel der Bauumgebung
+rm -f /etc/machine-id /var/lib/dbus/machine-id
+: > /etc/machine-id
+rm -f /etc/ssh/ssh_host_* 2>/dev/null || true
+
+# Protokolle
+find /var/log -type f -exec truncate -s 0 {} \; 2>/dev/null || true
+rm -f /var/log/*.gz /var/log/*.1 2>/dev/null || true
+
+# Live-Build-Reste
+rm -f /root/.bash_history /home/*/.bash_history 2>/dev/null || true
+
+exit 0

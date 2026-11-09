@@ -1,0 +1,119 @@
+Step by Step Live-Build - AMD64 Architecture Example
+
+-----------------------------------
+
+Suggested location for the build staging folder:
+
+  /eznixOS12X -- build folder
+
+Suggested location for the collection of preparation files and packages:
+
+  /eznix12X  -- files location
+
+
+The build procedure begins below. Copy and paste each command exactly unless you know what you are doing and are comfortable making changes.
+ALL COMMANDS NEED TO BE RUN AS ROOT!
+
+----------------------------------
+
+Step 1: Assign work, files, and build directory variables
+
+# Run command below to set the working directory:
+
+WKDIR="$(pwd)"
+FLDIR="eznix12X"
+BLDDIR="eznixOS12X"
+
+----------------------------------
+
+Step 2: Remove the icon cache cleaning hook, create the build staging folder, and cd into it
+
+# Run commands below to prepare for the build:
+
+rm /usr/share/live/build/hooks/normal/9000-remove-gnome-icon-cache.hook.chroot
+
+mkdir $BLDDIR
+cd $BLDDIR
+
+----------------------------------
+
+Step 3: Set up the live-build config
+
+# Run command below to configure live build:
+
+lb config --binary-images iso-hybrid --mode debian --architectures amd64 --linux-flavours amd64 --distribution bookworm --archive-areas "main contrib non-free non-free-firmware" --updates true --security true --cache true --apt-recommends true --firmware-binary true --firmware-chroot true --win32-loader false --iso-application $BLDDIR --iso-preparer eznix-https://sourceforge.net/projects/eznixos/ --iso-publisher eznix-https://sourceforge.net/projects/eznixos/ --image-name "$BLDDIR-$(date -u +"%y%m%d")" --iso-volume "$BLDDIR-$(date -u +"%y%m%d")" --checksums sha512 --clean --color
+
+----------------------------------
+
+Step 4: Pass the desktop and packages to the live-build config
+
+# Run command below to install the Xfce Desktop:
+
+echo "accountsservice arc-theme asunder atril breeze-gtk-theme breeze-icon-theme dconf-cli galculator geany gnome-keyring gnome-nettool gnome-system-tools greybird-gtk-theme gthumb guvcview gvfs-backends gvfs-fuse light-locker lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings mousepad network-manager-gnome network-manager-openconnect-gnome network-manager-openvpn-gnome numix-gtk-theme pavucontrol pulseaudio remmina simple-scan system-config-printer tango-icon-theme transmission-gtk xarchiver xfce4 xfce4-goodies xfce4-power-manager xfce4-terminal xscreensaver" > $WKDIR/$BLDDIR/config/package-lists/xfcedesktop.list.chroot
+
+echo "aisleriot alsa-utils apt-transport-https audacious audacious-plugins autoconf automake bleachbit btrfs-progs build-essential cdtool cdrdao cdrskin cifs-utils clonezilla cryptsetup cryptsetup-initramfs cups cups-filters curl dbus-user-session dbus-x11 debconf debhelper dh-autoreconf dialog dirmngr dkms dos2unix dosbox dosfstools dvdauthor exfatprogs faac faad fakeroot ffmpeg filezilla firefox-esr flac foomatic-db foomatic-db-engine frei0r-plugins fuse3 gdebi ghostscript gimp gir1.2-ibus-1.0 gnome-disk-utility gparted grsync grub-pc gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-plugins-good hardinfo haveged hplip-gui htop hunspell-en-us hyphen-en-us ibus ibus-data ibus-gtk ibus-gtk3 iftop im-config inxi isolinux iw jfsutils keepassxc lame less libegl1-mesa libibus-1.0-5 libgl1-mesa-glx libqt5opengl5 libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-writer libreoffice-gtk3 libreoffice-help-en-us libnss-mdns libsmbclient libxcb-xtest0 libxvidcore4 linux-headers-amd64 live-build lsb-release lshw meld mencoder menu mjpegtools mpg321 mpv mtools mythes-en-us neofetch netcat-openbsd ntfs-3g nvidia-detect openconnect openvpn openvpn-systemd-resolved os-prober p7zip-full p7zip-rar papirus-icon-theme pciutils perl plymouth plymouth-label plymouth-themes plymouth-x11 policykit-1 printer-driver-gutenprint python3-ibus-1.0 rar samba-common-bin simplescreenrecorder smbclient smplayer smplayer-l10n smplayer-themes soundconverter sox squashfs-tools streamripper sudo synaptic syslinux syslinux-common testdisk timeshift twolame udisks2 upower unrar unzip webext-keepassxc-browser wget x11-common x265 x264 xauth xclip xdg-utils xfsprogs xorg xserver-xorg-input-all xserver-xorg-video-all xorriso xterm zip zstd zulucrypt-gui zulumount-gui" > $WKDIR/$BLDDIR/config/package-lists/extrapackages.list.chroot
+
+echo "atmel-firmware bluez-firmware firmware-linux-free midisport-firmware firmware-misc-nonfree firmware-amd-graphics firmware-atheros firmware-bnx2 firmware-bnx2x firmware-brcm80211 firmware-cavium firmware-intel-sound firmware-iwlwifi firmware-libertas firmware-linux firmware-linux-nonfree firmware-misc-nonfree firmware-myricom firmware-netronome firmware-netxen firmware-qcom-media firmware-qcom-soc firmware-qlogic firmware-realtek firmware-samsung firmware-siano firmware-ti-connectivity firmware-sof-signed firmware-zd1211" > $WKDIR/$BLDDIR/config/package-lists/firmware.list.chroot
+
+echo "efibootmgr grub-common grub-pc-bin grub2-common grub-efi-amd64 grub-efi-amd64-bin grub-efi-amd64-signed grub-efi-ia32-bin libefiboot1 libefivar1 mokutil os-prober shim-helpers-amd64-signed shim-signed shim-signed-common shim-unsigned" > $WKDIR/$BLDDIR/config/package-lists/grubs.list.binary
+
+# Uncomment below line to include more Broadcom WiFi drivers:
+# echo "b43-fwcutter firmware-b43-installer firmware-b43legacy-installer" > $WKDIR/$BLDDIR/config/package-lists/bcmfirmware.list.chroot
+
+#  Include the Calamares Installer
+
+mkdir -p $WKDIR/$BLDDIR/config/includes.chroot/etc/
+cp -r $WKDIR/$FLDIR/calamares/ $WKDIR/$BLDDIR/config/includes.chroot/etc/
+echo "calamares calamares-settings-debian" > $WKDIR/$BLDDIR/config/package-lists/calamares.list.chroot
+
+----------------------------------
+
+Step 5: Make folders in the chroot 
+
+# Run command below to create needed folders:
+
+mkdir -p $WKDIR/$BLDDIR/config/hooks/normal/
+mkdir -p $WKDIR/$BLDDIR/config/includes.chroot/usr/local/bin/
+mkdir -p $WKDIR/$BLDDIR/config/includes.chroot/etc/skel/.config/
+mkdir -p $WKDIR/$BLDDIR/config/includes.chroot/usr/share/backgrounds/
+mkdir -p $WKDIR/$BLDDIR/config/includes.chroot/usr/share/applications/
+mkdir -p $WKDIR/$BLDDIR/config/includes.chroot/usr/share/icons/default/
+
+-----------------------------------
+
+Step 6: Copy files into the chroot and live-build config
+
+# Run commands below to copy build files into the live system:
+
+cp -r $WKDIR/$FLDIR/bootloaders/ $WKDIR/$BLDDIR/config/
+cp -r $WKDIR/$FLDIR/ $WKDIR/$BLDDIR/config/includes.chroot/usr/share/
+cp -r $WKDIR/$FLDIR/xfce4/ $WKDIR/$BLDDIR/config/includes.chroot/etc/skel/.config/
+cp $WKDIR/$FLDIR/hooks/* $WKDIR/$BLDDIR/config/hooks/normal/
+cp $WKDIR/$FLDIR/scripts/* $WKDIR/$BLDDIR/config/includes.chroot/usr/local/bin/
+cp $WKDIR/$FLDIR/icons/* $WKDIR/$BLDDIR/config/includes.chroot/usr/share/icons/default/
+cp $WKDIR/$FLDIR/backgrounds/* $WKDIR/$BLDDIR/config/includes.chroot/usr/share/backgrounds/
+cp $WKDIR/$FLDIR/launchers/ezadmin.desktop $WKDIR/$BLDDIR/config/includes.chroot/usr/share/applications/
+ln -s /usr/share/$FLDIR $WKDIR/$BLDDIR/config/includes.chroot/etc/skel/$FLDIR
+
+-----------------------------------
+
+# Run command below IF you wish to include deb packages from misc64 folder:
+
+# cp $WKDIR/$FLDIR/misc64/* $WKDIR/$BLDDIR/config/packages.chroot/
+
+-----------------------------------
+
+Step 7: Start the build process
+
+# Run command below to start live build:
+
+lb build
+
+-----------------------------------
+
+Step 8: Wait for the build to complete. The ISO will be inside the build folder
+
+-----------------------------------
+
+# bldeznix12X-howto.txt -- Revision: 12X -- by eznix (https://sourceforge.net/projects/eznixos/)
+# (GNU/General Public License version 3.0)

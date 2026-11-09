@@ -1,0 +1,60 @@
+# RSOS 2.0 -- KDE Plasma 6.3
+#
+# Minimalistische Plasma-Installation: kde-plasma-desktop ist das kleinste
+# offizielle KDE-Metapaket (Plasma + Dolphin + Basisanwendungen).
+# kde-standard und kde-full sind absichtlich NICHT dabei -- die ziehen KMail,
+# KOrganizer, Kontact und Spiele mit, die in RSOS nichts zu suchen haben.
+
+# --- Plasma selbst ---------------------------------------------------------
+kde-plasma-desktop
+kde-baseapps
+plasma-workspace
+plasma-desktop
+systemsettings
+kwin-x11
+kwin-wayland
+powerdevil
+kde-cli-tools
+kmenuedit
+kio-extras
+kscreen
+kinfocenter
+kde-config-screenlocker
+kwalletmanager
+libpam-kwallet5
+plasma-nm
+plasma-pa
+plasma-discover
+plasma-firewall
+plasma-systemmonitor
+plasma-thunderbolt
+plasma-vault
+plasma-welcome
+kde-spectacle
+print-manager
+kde-config-gtk-style
+breeze-gtk-theme
+
+# --- Anmeldeverwaltung -----------------------------------------------------
+sddm
+sddm-theme-breeze
+kde-config-sddm
+
+# --- KDE-Anwendungen -------------------------------------------------------
+ark
+dolphin
+gwenview
+kate
+kcalc
+kdeconnect
+konsole
+okular
+
+# --- Integration -----------------------------------------------------------
+xdg-desktop-portal-kde
+
+# --- Schriften -------------------------------------------------------------
+fonts-noto
+fonts-noto-color-emoji
+fonts-hack
+fonts-liberation2

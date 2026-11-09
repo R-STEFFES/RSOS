@@ -1,0 +1,44 @@
+# RSOS 2.0 -- Anwendungen
+#
+# Der Anwendungsblock der 1.x-Reihe, auf KDE umgestellt und ausgeduennt:
+# ein Browser, eine Buerosuite, Multimedia, ein Spiel. Nichts doppelt.
+
+# --- Internet und Buerosuite -----------------------------------------------
+firefox-esr
+firefox-esr-l10n-de
+libreoffice-calc
+libreoffice-draw
+libreoffice-impress
+libreoffice-writer
+libreoffice-gtk3
+libreoffice-l10n-de
+libreoffice-style-breeze
+hunspell-de-de
+mythes-de
+thunderbird
+thunderbird-l10n-de
+
+# --- Multimedia ------------------------------------------------------------
+audacious
+audacious-plugins
+ffmpeg
+gstreamer1.0-libav
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-ugly
+lame
+mpv
+soundconverter
+sox
+kdenlive
+
+# --- Grafik ----------------------------------------------------------------
+gimp
+imagemagick
+inkscape
+
+# --- Spiele und Freizeit ---------------------------------------------------
+luanti
+
+# --- Dateien und Netzlaufwerke ---------------------------------------------
+transmission-gtk

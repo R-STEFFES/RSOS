@@ -1,0 +1,63 @@
+# RSOS 2.0 -- ISO in GitHub Actions bauen
+#
+# Baut auf einem Wegwerf-Runner bei GitHub. Für den eigenen Rechner braucht es
+# damit weder root noch eine virtuelle Maschine -- der Runner *ist* die
+# Wegwerf-Maschine.
+#
+# Auslösen: manuell (Actions -> Build ISO -> Run workflow) oder per Tag v*.
+
+name: Build ISO
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Quellen holen
+        uses: actions/checkout@v4
+
+      - name: Werkzeuge installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            live-build debootstrap squashfs-tools xorriso \
+            isolinux syslinux-common syslinux-utils \
+            grub-efi-amd64-bin grub-pc-bin mtools dosfstools
+
+      - name: Version setzen
+        run: |
+          VERSION="$(cat VERSION)"
+          printf '%s\n' "$VERSION" > config/includes.chroot/etc/rsos-version
+          echo "RSOS_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Bauen
+        run: |
+          sudo --preserve-env=HOME lb build
+          ls -lh out/ || true
+
+      - name: ISO pruefen
+        run: |
+          ISO="$(ls out/*.iso 2>/dev/null | head -1 || ls *.iso | head -1)"
+          echo "ISO=$ISO" >> "$GITHUB_ENV"
+          xorriso -indev "$ISO" -report_el_torito as_mkisofs | head -20 || true
+          unsquashfs -l "$ISO" 2>/dev/null || true
+
+      - name: ISO als Artefakt
+        uses: actions/upload-artifact@v4
+        with:
+          name: rsos-${{ env.RSOS_VERSION }}-iso
+          path: |
+            out/*.iso
+            *.iso
+          if-no-files-found: error
+          retention-days: 14

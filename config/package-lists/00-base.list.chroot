@@ -1,0 +1,117 @@
+# RSOS 2.0 -- Basissystem, Live-Schicht, Installer, Werkzeuge
+# Debian 13 "trixie", amd64
+#
+# Bewusst schlank gehalten: kein zweites Bueropaket, keine Brennprogramme,
+# kein Clonezilla. Alles Weitere holt der Nutzer ueber plasma-discover.
+
+# --- Live-System und Installer ---------------------------------------------
+live-boot
+live-config
+live-config-systemd
+live-tools
+calamares
+calamares-settings-debian
+
+# --- System und Paketverwaltung --------------------------------------------
+apt-utils
+bash-completion
+ca-certificates
+debconf
+dirmngr
+gnupg
+lsb-release
+man-db
+plocate
+rsync
+sudo
+tzdata
+unzip
+zip
+zstd
+
+# --- Hardware, Datentraeger, Dateisysteme ----------------------------------
+bleachbit
+btrfs-progs
+cifs-utils
+cryptsetup
+cryptsetup-initramfs
+dmidecode
+dosfstools
+exfatprogs
+fuse3
+gparted
+gvfs-backends
+gvfs-fuse
+lm-sensors
+lshw
+lsof
+mtools
+net-tools
+network-manager
+ntfs-3g
+os-prober
+p7zip-full
+parted
+pciutils
+smartmontools
+udisks2
+upower
+usbutils
+xfsprogs
+
+# --- Netz und Fernzugriff --------------------------------------------------
+curl
+filezilla
+openssh-client
+openvpn
+network-manager-openvpn-gnome
+remmina
+smbclient
+wget
+
+# --- Grafik-Grundlage (X11 und Wayland) ------------------------------------
+xorg
+xserver-xorg-input-all
+xserver-xorg-video-all
+xauth
+xclip
+xdg-utils
+xinit
+xterm
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+
+# --- Ton (PipeWire) --------------------------------------------------------
+alsa-utils
+pipewire
+pipewire-pulse
+wireplumber
+libspa-0.2-bluetooth
+bluetooth
+bluez
+
+# --- Bootsplash ------------------------------------------------------------
+plymouth
+plymouth-label
+plymouth-themes
+plymouth-x11
+
+# --- Drucken und Scannen ---------------------------------------------------
+cups
+cups-filters
+foomatic-db
+printer-driver-gutenprint
+simple-scan
+
+# --- Sicherheit ------------------------------------------------------------
+keepassxc
+webext-keepassxc-browser
+
+# --- Kleinkram, den man im Terminal erwartet -------------------------------
+htop
+inxi
+less
+nano
+screen
+tree
+vim-tiny

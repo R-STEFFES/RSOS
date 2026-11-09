@@ -1,0 +1,84 @@
+#!/bin/sh
+# RSOS 2.0 -- KDE-Plasma-Voreinstellungen
+#
+# Setzt nur, was ohne Sitzung nicht automatisch entsteht: Anmeldung des
+# Live-Benutzers, Standardsitzung, Hintergrundbilder und die deutsche
+# Oberflaechensprache. Das eigentliche Plasma-Layout (Panel, Widgets,
+# Farbschema) wird NICHT hier erfunden, sondern mit
+# scripts/capture-kde-config.sh von einem eingerichteten System abgezogen
+# und in config/includes.chroot/etc/skel/.config/ abgelegt -- siehe
+# docs/KDE-KONFIGURATION.md.
+
+set -e
+
+# --- Anmeldung des Live-Benutzers an SDDM ---------------------------------
+# Wird von Calamares beim Installieren wieder entfernt (shellprocess-Modul),
+# damit das installierte System einen normalen Anmeldebildschirm bekommt.
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/10-rsos-live.conf <<'EOF'
+[Autologin]
+User=rsos
+Session=plasma
+
+[Theme]
+Current=breeze
+EOF
+
+# --- Standardsitzung -------------------------------------------------------
+mkdir -p /var/lib/AccountsService/users
+cat > /var/lib/AccountsService/users/rsos <<'EOF'
+[User]
+Session=plasma
+XSession=plasma
+Icon=/usr/share/icons/hicolor/scalable/apps/lava-lamp.svg
+SystemAccount=false
+EOF
+
+# --- Hintergrundbilder -----------------------------------------------------
+# Die Wandbilder liegen bereits unter /usr/share/backgrounds/rsos/.
+# Zusaetzlich als Plasma-Wandbildpaket, damit sie in den Systemeinstellungen
+# unter "Hintergrundbilder" auftauchen (nicht nur als Dateien).
+mkdir -p /usr/share/wallpapers/RSOS/contents/images
+cat > /usr/share/wallpapers/RSOS/metadata.json <<'EOF'
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Steffes Industries"
+            }
+        ],
+        "Description": "RSOS",
+        "Id": "RSOS",
+        "License": "GPL-3.0",
+        "Name": "RSOS"
+    },
+    "X-KDE-PlasmaImageWallpaper": true
+}
+EOF
+
+# --- Deutsche Oberflaeche fuer neue Nutzer ---------------------------------
+mkdir -p /etc/skel/.config
+cat > /etc/skel/.config/kdeglobals <<'EOF'
+[General]
+ColorScheme=Breeze
+Name=RSOS
+
+[KDE]
+LookAndFeelPackage=org.kde.breeze.desktop
+SingleClick=false
+widgetStyle=Breeze
+
+[Locale]
+Country=de_DE
+Language=de_DE
+MeasureSystem=1
+EOF
+
+# --- Baloo (Dateiindex) im Live-Betrieb nicht noetig, spart Plattenlast ----
+mkdir -p /etc/xdg/baloo
+cat > /etc/xdg/baloo/baloofilerc <<'EOF'
+[Basic Settings]
+Indexing-Enabled=false
+EOF
+
+exit 0

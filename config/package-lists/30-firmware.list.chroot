@@ -1,0 +1,34 @@
+# RSOS 2.0 -- Firmware
+#
+# Ohne diese Pakete starten WLAN, Grafik und Sound auf vielen Rechnern nicht.
+# Die Liste ist der Firmware-Satz der 1.x-Reihe, geprueft gegen Debian 13.
+# Steht in main/non-free-firmware.
+
+atmel-firmware
+bluez-firmware
+firmware-amd-graphics
+firmware-atheros
+firmware-bnx2
+firmware-bnx2x
+firmware-brcm80211
+firmware-cavium
+firmware-intel-sound
+firmware-iwlwifi
+firmware-libertas
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+firmware-misc-nonfree
+firmware-myricom
+firmware-netronome
+firmware-netxen
+firmware-qcom-media
+firmware-qcom-soc
+firmware-qlogic
+firmware-realtek
+firmware-samsung
+firmware-siano
+firmware-sof-signed
+firmware-ti-connectivity
+firmware-zd1211
+midisport-firmware

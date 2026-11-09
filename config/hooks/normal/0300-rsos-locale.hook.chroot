@@ -1,0 +1,50 @@
+#!/bin/sh
+# RSOS 2.0 -- Sprache, Tastatur, Zeitzone
+#
+# RSOS ist ein deutsches System: de_DE.UTF-8 ist die Standardsitzung,
+# en_US.UTF-8 bleibt als Rueckfall drin. Die Live-Sitzung bekommt die
+# gleichen Werte ueber die Kernel-Kommandozeile (siehe auto/config).
+
+set -e
+
+# --- Locales erzeugen ------------------------------------------------------
+if [ -e /etc/locale.gen ]; then
+	sed -i -e 's|^# *de_DE.UTF-8 UTF-8|de_DE.UTF-8 UTF-8|' \
+	       -e 's|^# *en_US.UTF-8 UTF-8|en_US.UTF-8 UTF-8|' /etc/locale.gen
+	# Eigene Zeilen anhaengen, falls das Muster nicht griff
+	grep -q '^de_DE.UTF-8 UTF-8' /etc/locale.gen || echo 'de_DE.UTF-8 UTF-8' >> /etc/locale.gen
+	grep -q '^en_US.UTF-8 UTF-8' /etc/locale.gen || echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
+	locale-gen || true
+fi
+
+cat > /etc/default/locale <<'EOF'
+LANG=de_DE.UTF-8
+LANGUAGE=de_DE:de
+LC_TIME=de_DE.UTF-8
+LC_NUMERIC=de_DE.UTF-8
+LC_MONETARY=de_DE.UTF-8
+LC_PAPER=de_DE.UTF-8
+LC_MEASUREMENT=de_DE.UTF-8
+LC_MESSAGES=de_DE.UTF-8
+EOF
+
+# --- Tastatur und Konsole --------------------------------------------------
+cat > /etc/default/keyboard <<'EOF'
+XKBMODEL="pc105"
+XKBLAYOUT="de"
+XKBVARIANT=""
+XKBOPTIONS=""
+BACKSPACE="guess"
+EOF
+
+cat > /etc/vconsole.conf <<'EOF'
+KEYMAP=de
+FONT=LatArCyrHeb-16
+EOF
+
+# --- Zeitzone --------------------------------------------------------------
+ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+echo "Europe/Berlin" > /etc/timezone
+dpkg-reconfigure -f noninteractive tzdata >/dev/null 2>&1 || true
+
+exit 0

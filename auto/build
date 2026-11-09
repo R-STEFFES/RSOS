@@ -1,0 +1,28 @@
+#!/bin/sh
+# RSOS -- Bauen.
+# Wird von `lb build` aufgerufen. Laeuft im Projektwurzelverzeichnis.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+VERSION="$(cat VERSION)"
+NAME="RSOS-${VERSION}"
+DATE="$(date -u +%Y%m%d)"
+
+# Volle Ausgabe mitschreiben -- ein ISO-Bau laeuft 20-60 Minuten, im Fehlerfall
+# ist build.log die einzige Spur.
+exec 2>&1 | tee "build.log"
+
+lb build
+
+# Ergebnis einsammeln
+mkdir -p out
+for f in ./*.hybrid.iso ./*.iso; do
+	[ -e "$f" ] || continue
+	mv -v "$f" "out/${NAME}-${DATE}-amd64.hybrid.iso"
+done
+
+echo
+echo "Fertig. ISO liegt in out/"
+ls -lh out/

@@ -1,0 +1,46 @@
+#!/bin/sh
+# RSOS -- live-build Projektkonfiguration (Version 2.0)
+#
+# Wird von `lb` aus dem Projektwurzelverzeichnis aufgerufen und richtet den
+# Build ein: Debian 13 "trixie", amd64, systemd, hybride ISO (BIOS + UEFI),
+# Calamares-Installer, deutsche Voreinstellungen fuer die Live-Sitzung.
+#
+# Die Paketauswahl steht NICHT hier, sondern in config/package-lists/.
+# Alles, was hier steht, gilt fuer jeden Bauweg (Host, Container, CI).
+
+set -e
+
+# Immer vom Projektwurzelverzeichnis aus arbeiten, egal von wo lb aufgerufen wird
+cd "$(dirname "$0")/.."
+
+VERSION="$(cat VERSION)"
+NAME="RSOS-${VERSION}"
+DATE="$(date -u +%Y%m%d)"
+
+lb config noauto \
+	--mode debian \
+	--distribution trixie \
+	--architectures amd64 \
+	--linux-flavours amd64 \
+	--initsystem systemd \
+	--archive-areas "main contrib non-free non-free-firmware" \
+	--updates true \
+	--security true \
+	--backports true \
+	--apt-recommends true \
+	--apt-options "--yes --option Acquire::Retries=3" \
+	--cache true \
+	--binary-images iso-hybrid \
+	--bootloaders "syslinux,grub-efi" \
+	--debian-installer false \
+	--firmware-binary true \
+	--firmware-chroot true \
+	--win32-loader false \
+	--image-name "${NAME}-${DATE}-amd64" \
+	--iso-application "RSOS" \
+	--iso-preparer "Steffes Industries <https://steffes.industries/>" \
+	--iso-publisher "Steffes Industries <https://steffes.industries/>" \
+	--iso-volume "RSOS${VERSION//./_}" \
+	--bootappend-live "boot=live components username=rsos hostname=rsos locales=de_DE.UTF-8 keyboard-layouts=de keyboard-model=pc105 timezone=Europe/Berlin quiet splash" \
+	--checksums sha512 \
+	--color
