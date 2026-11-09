@@ -38,7 +38,8 @@ EOF
 fi
 
 # --- Version in den Chroot spiegeln ---------------------------------------
-printf '%s\n' "$(cat VERSION)" > config/includes.chroot/etc/rsos-version
+printf '%s\n' "$(cat VERSION)"   > config/includes.chroot/etc/rsos-version
+printf '%s\n' "$(cat CODENAME)" > config/includes.chroot/etc/rsos-codename
 
 # --- Bauen -----------------------------------------------------------------
 case "${1:-}" in

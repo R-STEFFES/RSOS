@@ -37,7 +37,9 @@ jobs:
       - name: Version setzen
         run: |
           VERSION="$(cat VERSION)"
-          printf '%s\n' "$VERSION" > config/includes.chroot/etc/rsos-version
+          CODENAME="$(cat CODENAME)"
+          printf '%s\n' "$VERSION"   > config/includes.chroot/etc/rsos-version
+          printf '%s\n' "$CODENAME" > config/includes.chroot/etc/rsos-codename
           echo "RSOS_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Bauen

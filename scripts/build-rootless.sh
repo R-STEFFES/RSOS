@@ -43,7 +43,8 @@ export DEBOOTSTRAP_DIR="$TC/root/usr/share/debootstrap"
 export TAR_OPTIONS="--no-same-owner"
 
 # --- Version spiegeln ------------------------------------------------------
-printf '%s\n' "$(cat VERSION)" > config/includes.chroot/etc/rsos-version
+printf '%s\n' "$(cat VERSION)"   > config/includes.chroot/etc/rsos-version
+printf '%s\n' "$(cat CODENAME)" > config/includes.chroot/etc/rsos-codename
 
 # --- Bauen -----------------------------------------------------------------
 case "${1:-}" in

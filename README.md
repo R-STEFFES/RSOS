@@ -12,7 +12,7 @@ Image aus dem Debian-Baukasten (`live-build`).
 
 | | |
 |---|---|
-| Aktuell im Repo | **2.0** (siehe `VERSION`) |
+| Aktuell im Repo | **2.0 „Janina“** (siehe `VERSION`, `CODENAME`) |
 | Debian-Basis | **13 „trixie"** |
 | Desktop | **KDE Plasma 6.3** (minimal: `kde-plasma-desktop`, kein `kde-full`) |
 | Architektur | amd64 |
@@ -20,7 +20,7 @@ Image aus dem Debian-Baukasten (`live-build`).
 | Paketquellen | ausschließlich orginale Debian-Repos, keine eigenen Quellen |
 | Vorgänger | 1.08/1.09 „Hannah" auf Debian 12 mit XFCE |
 
-Geplanter Nachfolger der 1.x-Reihe. Der Umstieg auf KDE Plasma ist der Kern
+Geplanter Nachfolger der 1.x-Reihe, Beiname **Janina**. Der Umstieg auf KDE Plasma ist der Kern
 der 2.0 (Begründung siehe `docs/ROADMAP.md`), ebenso der Wechsel von Debian 12
 auf Debian 13.
 

@@ -35,12 +35,12 @@ cd ~/Schreibtisch/RSOS
 ./scripts/build.sh            # fragt einmal nach dem Passwort
 ```
 
-Ergebnis: `out/rsos-2.0-<datum>-amd64.hybrid.iso`
+Ergebnis: `out/RSOS-2.0-Janina-<datum>-amd64.hybrid.iso`
 
 Die ISO ist *hybrid*: sie bootet von DVD **und** vom USB-Stick.
 
 ```bash
-sudo dd if=out/rsos-2.0-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
+sudo dd if=out/RSOS-2.0-Janina-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ```
 
 **Zeit und Platz:** erster Bau ~25–45 min auf einer normalen SSD, ~2,5 GB
@@ -146,13 +146,13 @@ Man muss nicht mounten, um hineinzuschauen:
 
 ```bash
 # Inhalt der ISO
-xorriso -indev out/rsos-2.0-*.iso -find / -type f 2>/dev/null | head -40
+xorriso -indev out/RSOS-2.0-Janina-*.iso -find / -type f 2>/dev/null | head -40
 
 # Bootfähigkeit prüfen (El Torito + EFI)
-xorriso -indev out/rsos-2.0-*.iso -report_el_torito as_mkisofs
+xorriso -indev out/RSOS-2.0-Janina-*.iso -report_el_torito as_mkisofs
 
 # Inhalt des Squashfs
-unsquashfs -l out/../binary/live/filesystem.squashfs | head -40
+unsquashfs -l binary/live/filesystem.squashfs | head -40
 ```
 
 `scripts/verify-iso.sh` macht genau das und prüft zusätzlich, ob Kernel,
@@ -161,7 +161,7 @@ Initramfs, Squashfs und Bootloader vorhanden sind.
 Zum echten Hineinschauen (nur mit root):
 
 ```bash
-sudo mount -o loop,ro out/rsos-2.0-*.iso /mnt/iso
+sudo mount -o loop,ro out/RSOS-2.0-Janina-*.iso /mnt/iso
 sudo mkdir -p /tmp/rsos && sudo mount -t squashfs -o loop,ro \
      /mnt/iso/live/filesystem.squashfs /tmp/rsos
 # ... schauen ...

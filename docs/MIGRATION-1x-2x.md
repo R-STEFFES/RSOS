@@ -1,4 +1,4 @@
-# Von 1.x auf 2.0 — was sich ändert
+# Von 1.x auf 2.0 „Janina“ — was sich ändert
 
 Das alte Build-Verzeichnis (`RSOS_1`, zuletzt 1.09 „Hannah") ist als
 Rohmaterial in `assets/legacy/` mitgezogen: Branding, Splash, Wallpaper,

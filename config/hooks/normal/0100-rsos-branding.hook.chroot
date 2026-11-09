@@ -8,17 +8,21 @@
 set -e
 
 VERSION="$(cat /etc/rsos-version 2>/dev/null || echo 2.0)"
+CODENAME="$(cat /etc/rsos-codename 2>/dev/null || echo Janina)"
+# Ausgeschriebener Name, wie er in Anzeigen und im Installer erscheint
+FULLNAME="${VERSION} ${CODENAME}"
 
 # --- os-release ------------------------------------------------------------
 # Nach /usr/lib/os-release schreiben und /etc/os-release darauf verlinken --
 # so wie Debian es selbst macht. Wer zuerst /etc/os-release schreibt und dann
 # verlinkt, ueberschreibt seinen eigenen Inhalt.
 cat > /usr/lib/os-release <<EOF
-PRETTY_NAME="RSOS ${VERSION}"
+PRETTY_NAME="RSOS ${FULLNAME}"
 NAME="RSOS"
 VERSION_ID="${VERSION}"
-VERSION="${VERSION}"
+VERSION="${FULLNAME}"
 VERSION_CODENAME=trixie
+RSOS_CODENAME="${CODENAME}"
 ID=rsos
 ID_LIKE=debian
 HOME_URL="https://steffes.industries/"
@@ -33,18 +37,18 @@ if [ -e /etc/lsb-release ]; then
 	cat > /etc/lsb-release <<EOF
 DISTRIB_ID=RSOS
 DISTRIB_RELEASE=${VERSION}
-DISTRIB_CODENAME=trixie
-DISTRIB_DESCRIPTION="RSOS ${VERSION}"
+DISTRIB_CODENAME=${CODENAME}
+DISTRIB_DESCRIPTION="RSOS ${FULLNAME}"
 EOF
 fi
 
 # --- Grußtexte -------------------------------------------------------------
-printf '\nRSOS %s -- Debian GNU/Linux 13 (trixie) -- https://steffes.industries/\n\n' "${VERSION}" > /etc/issue
+printf '\nRSOS %s -- Debian GNU/Linux 13 (trixie) -- https://steffes.industries/\n\n' "${FULLNAME}" > /etc/issue
 cp /etc/issue /etc/issue.net
 
 cat > /etc/motd <<EOF
 
-  RSOS ${VERSION}
+  RSOS ${FULLNAME}
   Steffes Industries -- https://steffes.industries/
 
   Installieren:  "install-debian" im Anwendungsmenue oder Calamares starten

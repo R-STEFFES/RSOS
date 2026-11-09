@@ -9,7 +9,8 @@ set -e
 cd "$(dirname "$0")/.."
 
 VERSION="$(cat VERSION)"
-NAME="RSOS-${VERSION}"
+CODENAME="$(cat CODENAME)"
+NAME="RSOS-${VERSION}-${CODENAME}"
 DATE="$(date -u +%Y%m%d)"
 
 # Ausgabe gleichzeitig auf den Bildschirm und in build.log -- ein Bau laeuft

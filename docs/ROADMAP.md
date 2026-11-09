@@ -1,4 +1,4 @@
-# RSOS 2.0 — Plan
+# RSOS 2.0 „Janina“ — Plan
 
 ## Ausgangslage
 
@@ -16,6 +16,7 @@ jemandem in die Hand drücken kann, ohne 40 Anwendungen zu erklären.
 
 | | |
 |---|---|
+| Name | **RSOS 2.0 „Janina"** |
 | Basis | Debian 13 „trixie" |
 | Desktop | KDE Plasma 6.3, minimal (`kde-plasma-desktop`) |
 | Anmeldung | SDDM (Breeze) |
@@ -60,8 +61,8 @@ jemandem in die Hand drücken kann, ohne 40 Anwendungen zu erklären.
 3. **Ersatz für `ezadmin`.** Braucht es ein RSOS-Werkzeug (Systeminfo,
    Sprachwechsel, Backports an/aus)? Wenn ja: neu schreiben, nicht das
    eznix-Skript umbenennen.
-4. **Beiname.** Die 1.x-Reihe hieß durchgehend „Hannah". Ob 2.0 einen eigenen
-   Beinamen bekommt, ist nicht entschieden — im Branding steht nur „2.0".
+4. **Beiname: erledigt.** 2.0 heißt **„Janina"** (von Raphael gesetzt am
+   2026-11-09). Steht in `CODENAME`, im Branding und in `os-release`.
 5. **XFCE als Zweitimage?** Für schwache Hardware war XFCE im Gespräch. Erst
    entscheiden, wenn 2.0 steht.
 6. **Release-Notes.** Für 1.09 „Hannah" fehlen sie noch; für 2.0 gehören sie

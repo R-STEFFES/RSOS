@@ -14,7 +14,8 @@ set -e
 cd "$(dirname "$0")/.."
 
 VERSION="$(cat VERSION)"
-NAME="RSOS-${VERSION}"
+CODENAME="$(cat CODENAME)"
+NAME="RSOS-${VERSION}-${CODENAME}"
 DATE="$(date -u +%Y%m%d)"
 # Volumenname der ISO: Punkte sind dort nicht ueblich, also 2.0 -> 2_0
 VOLUME="RSOS$(printf '%s' "${VERSION}" | tr '.' '_')"
@@ -39,7 +40,7 @@ lb config noauto \
 	--firmware-chroot true \
 	--win32-loader false \
 	--image-name "${NAME}-${DATE}-amd64" \
-	--iso-application "RSOS" \
+	--iso-application "${NAME}" \
 	--iso-preparer "Steffes Industries <https://steffes.industries/>" \
 	--iso-publisher "Steffes Industries <https://steffes.industries/>" \
 	--iso-volume "${VOLUME}" \
