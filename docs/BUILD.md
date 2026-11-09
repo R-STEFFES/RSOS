@@ -93,9 +93,22 @@ Optionen:
 
 `--refresh` ist der Weg nach Änderungen an Paketlisten, Includes oder Hooks:
 live-build merkt sich erledigte Stufen als Marker in `.build/` und würde sie
-sonst überspringen — die Änderung käme nie im Image an. Zurückgesetzt werden
-Paketlisten, Paketinstallation, Includes nach der Installation, Hooks und die
-ganze Binary-Stufe.
+sonst überspringen — die Änderung käme nie im Image an. Zurückgesetzt wird die
+**ganze Chroot-Stufe** und die **Binary-Stufe**; der Bootstrap (2 GB Download)
+bleibt stehen.
+
+Warum nicht einzelne Schritte: im Arbeitsvolume können Marker aus
+verschiedenen Läufen stehen — ein Schritt wurde neu gebaut, während ein alter
+Marker stehen blieb. Dann überspringt live-build Schritte, deren Ergebnis nicht
+mehr da ist. Das hat nacheinander zu drei Abbrüchen geführt:
+
+| Abbruch | Ursache |
+|---|---|
+| `grub-efi-amd64 Conflicts grub-pc` | alte Paketliste in `chroot/root/packages.chroot` |
+| `lb chroot_devpts already locked` | Sperre `.lock` aus einem gestoppten Lauf |
+| `cp: cannot stat chroot/boot/vmlinuz-*` | Kernel-Stufe übersprungen, Kernel aber nicht im Chroot |
+
+Deshalb räumt `--refresh` auch die Sperre und die Paketliste im Chroot weg.
 
 **Erwartung dämpfen:** live-build räumt die Marker der Chroot-Stufe nach einem
 erfolgreichen Bau selbst weg. Nach einem *abgeschlossenen* Bau findet

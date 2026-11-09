@@ -109,15 +109,22 @@ if [ "${1:-}" = "--refresh" ]; then
 	echo "==> Geaenderte Stufen zuruecksetzen (Paketlisten, Includes, Hooks, Binary)"
 	"$ENGINE" run --rm --privileged -v "$VOL":/work "$IMAGE" /bin/sh -c '
 		cd /work/.build 2>/dev/null || exit 0
-		rm -f chroot_package-lists.install chroot_package-lists.live \
-		      chroot_install-packages.install chroot_install-packages.live \
-		      chroot_includes_after_packages chroot_hooks
-		rm -f binary_*
-		# WICHTIG: live-build schreibt die Paketliste mit ">>" in
-		# chroot/root/packages.chroot und leert sie nie. Auf einem neuen
-		# Chroot faellt das nicht auf -- hier wuerden alte Eintraege
-		# stehenbleiben und mitinstalliert werden (genau das hat einmal
-		# einen Bau mit "grub-pc" scheitern lassen).
+		# Die ganze Chroot-Stufe zuruecksetzen, nicht einzelne Schritte.
+		# Grund: im Arbeitsvolume koennen Marker aus verschiedenen Laeufen
+		# stehen (ein Schritt wurde neu gebaut, waehrend ein alter Marker
+		# stehen blieb). Dann ueberspringt live-build Schritte, deren
+		# Ergebnis gar nicht mehr da ist -- das hat nacheinander zu
+		# drei Abbruechen gefuehrt:
+		#   "grub-efi-amd64 Conflicts grub-pc"  (alte Paketliste)
+		#   "lb chroot_devpts already locked"   (Sperre)
+		#   "cp: cannot stat chroot/boot/vmlinuz-*"  (Kernel-Stufe uebersprungen)
+		# Bootstrap und sein Cache bleiben stehen: der Teil ist teuer (2 GB
+		# Download) und wird nicht durch Include-, Hook- oder Paketaenderungen
+		# beeinflusst.
+		rm -f chroot_* binary_*
+		# live-build schreibt die Paketliste mit ">>" nach
+		# chroot/root/packages.chroot und leert die Datei nie. Alte Eintraege
+		# bleiben sonst stehen und werden mitinstalliert.
 		rm -f /work/chroot/root/packages.chroot \
 		      /work/chroot/root/packages.foreign-architectures
 		echo "zurueckgesetzt: $(ls | tr "\n" " ")"'
