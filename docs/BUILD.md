@@ -62,6 +62,15 @@ Das Image (`scripts/container/Dockerfile`) ist Debian 13 mit den offiziellen
 Bauwerkzeugen. Der Quellordner wird hereingemountet, gebaut wird drinnen. Der
 Container hat root, der Wirtsrechner nicht.
 
+Der Container läuft bewusst mit `--privileged`: live-build mountet im Chroot
+`/proc`, `/sys` und `/dev` und legt dort Gerätedateien an — ohne
+`CAP_SYS_ADMIN` bricht der Bau beim ersten Chroot-Schritt ab. Der Container ist
+wegwerfbar und sieht nichts außer dem hereingebundenen Projektordner.
+
+Auf diesem Rechner ist der Weg der bequemste, wenn Docker Desktop läuft: der
+Bau läuft dann komplett ohne Passwort ab. Ohne laufenden Daemon hilft nur
+Weg 1 (mit `sudo`) oder Weg 4 (GitHub Actions).
+
 Vorteil: reproduzierbar, gleiche Werkzeugversionen auf jedem Rechner.
 Nachteil: braucht einen laufenden Docker-Daemon.
 
