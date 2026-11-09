@@ -53,3 +53,12 @@ sudo --preserve-env=HOME lb build
 echo
 echo "Fertig. ISO(s) in ${PROJECT}/out/"
 ls -lh out/ 2>/dev/null || true
+
+# Die ISO zusaetzlich nach ~/Downloads legen -- dort liegen die anderen
+# Testimages, und von dort laesst sie sich direkt in der VM auswaehlen.
+if [ -d "${HOME}/Downloads" ]; then
+	for f in out/*.iso; do
+		[ -e "$f" ] || continue
+		cp -v "$f" "${HOME}/Downloads/"
+	done
+fi
