@@ -43,6 +43,16 @@
 /rootfs/
 /isoroot/
 
+# live-build verlinkt seine Standardhooks bei jedem `lb config` selbst nach
+# config/hooks/ -- absolut auf /usr/share/live/build/hooks. Abschaltbar ist das
+# nicht. Unsere eigenen Haken liegen in config/hooks/normal/ und sind durchweg
+# 0xxx numeriert, die von live-build gelieferten beginnen bei 1000.
+/config/hooks/live/*
+/config/hooks/normal/1*
+/config/hooks/normal/5*
+/config/hooks/normal/8*
+/config/hooks/normal/9*
+
 # Editor / System
 *~
 *.swp
