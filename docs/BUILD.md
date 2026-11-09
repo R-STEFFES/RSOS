@@ -87,8 +87,16 @@ Optionen:
 |---|---|
 | `./scripts/container/build.sh` | frischer Bau (Arbeitsvolume wird neu angelegt) |
 | `... --keep` | Arbeitsvolume behalten — zweiter Lauf spart Bootstrap und Pakete |
+| `... --refresh` | Volume behalten, aber geänderte Stufen neu laufen lassen |
 | `... --shell` | Shell im Container, Projektordner lesend unter `/src` |
 | `... --clean` | Arbeitsvolume wegwerfen |
+
+`--refresh` ist der Weg nach Änderungen an Paketlisten, Includes oder Hooks:
+live-build merkt sich erledigte Stufen als Marker in `.build/` und würde sie
+sonst überspringen — die Änderung käme nie im Image an. Zurückgesetzt werden
+Paketlisten, Paketinstallation, Includes nach der Installation, Hooks und die
+ganze Binary-Stufe; der fertige Chroot bleibt liegen, die 2 GB Download
+entfallen.
 
 ### Squashfs-Kompression
 

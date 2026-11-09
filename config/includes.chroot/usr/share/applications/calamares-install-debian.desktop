@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RSOS installieren
+GenericName=System auf die Festplatte installieren
+Exec=calamares-install-debian
+Comment=RSOS auf diesen Rechner installieren
+Keywords=calamares;rsos;system;install;installer;installation;festplatte
+Icon=calamares
+Terminal=false
+Categories=Qt;System;
+StartupWMClass=calamares
+StartupNotify=True

@@ -54,6 +54,21 @@ syslinux-utils
 xorriso
 zsync
 
+# --- Was der Installer im Zielsystem braucht -------------------------------
+# Calamares installiert den Bootloader ueber Debian's Helfer
+# calamares-bootloader-config, und der ruft im Ziel auf:
+#
+#     apt-get -y install grub-pc     (BIOS)  bzw.  grub-efi  (UEFI)
+#
+# Im Ziel gibt es keine Paketquelle (die ISO bringt keinen Paketpool mit), das
+# holt also nichts nach -- der Schritt bricht ab mit einem Fehler zu "grub-pc".
+# Sind die Metapakete dagegen schon im Live-System, liegt der Zielkopie alles
+# vor und apt meldet nur "already the newest version": nachgemessen, rc=0 auch
+# ganz ohne Paketlisten. grub-efi zieht efibootmgr mit.
+grub-pc
+grub-efi
+efibootmgr
+
 # --- Hardware, Datentraeger, Dateisysteme ----------------------------------
 bleachbit
 btrfs-progs

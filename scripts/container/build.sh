@@ -3,8 +3,13 @@
 #
 #   ./scripts/container/build.sh            # frisch bauen
 #   ./scripts/container/build.sh --keep     # Arbeitsvolume behalten (2. Lauf schneller)
+#   ./scripts/container/build.sh --refresh  # Volume behalten, geaenderte Stufen neu laufen lassen
 #   ./scripts/container/build.sh --shell    # nur eine Shell im Container
 #   ./scripts/container/build.sh --clean    # Arbeitsvolume wegwerfen
+#
+# --refresh ist der Weg, wenn sich Paketlisten, Includes oder Hooks geaendert
+# haben: das Arbeitsvolume mit dem fertigen Chroot bleibt liegen, aber die
+# Stufen, die davon abhaengen, laufen neu -- statt 2 GB neu zu laden.
 #
 # Voraussetzung: docker mit laufendem Daemon. Bei Docker Desktop startet man ihn
 # ohne root mit:  systemctl --user start docker-desktop
@@ -63,8 +68,8 @@ printf '%s\n' "$(cat VERSION)"   > config/includes.chroot/etc/rsos-version
 printf '%s\n' "$(cat CODENAME)" > config/includes.chroot/etc/rsos-codename
 
 # Frischer Lauf: altes Arbeitsvolume wegwerfen, sonst schleppt der Bau Reste
-# des letzten Versuchs mit. Mit --keep bleibt es erhalten.
-if [ "${1:-}" = "--keep" ]; then
+# des letzten Versuchs mit. Mit --keep und --refresh bleibt es erhalten.
+if [ "${1:-}" = "--keep" ] || [ "${1:-}" = "--refresh" ]; then
 	[ -n "$("$ENGINE" volume ls -q -f "name=^${VOL}$")" ] || "$ENGINE" volume create "$VOL" >/dev/null
 else
 	"$ENGINE" volume rm "$VOL" >/dev/null 2>&1 || true
@@ -81,6 +86,21 @@ fi
 echo "==> Quellen ins Arbeitsvolume kopieren"
 "$ENGINE" run --rm --privileged -v "$VOL":/work -v "$PROJECT":/src:ro \
 	"$IMAGE" /bin/sh -c 'cp -a /src/. /work/ && rm -rf /work/.git'
+
+# --refresh: die Stufen zuruecksetzen, die von geaenderten Paketlisten,
+# Includes oder Hooks abhaengen. live-build merkt sich erledigte Stufen als
+# Marker in .build/ und wuerde sie sonst ueberspringen -- die Aenderung kaeme
+# nie im Image an. Der fertige Chroot bleibt dabei erhalten.
+if [ "${1:-}" = "--refresh" ]; then
+	echo "==> Geaenderte Stufen zuruecksetzen (Paketlisten, Includes, Hooks, Binary)"
+	"$ENGINE" run --rm --privileged -v "$VOL":/work "$IMAGE" /bin/sh -c '
+		cd /work/.build 2>/dev/null || exit 0
+		rm -f chroot_package-lists.install chroot_package-lists.live \
+		      chroot_install-packages.install chroot_install-packages.live \
+		      chroot_includes_after_packages chroot_hooks
+		rm -f binary_*
+		echo "zurueckgesetzt: $(ls | tr "\n" " ")"'
+fi
 
 echo "==> Build im Volume -- das dauert 25 bis 45 Minuten"
 if [ -n "${RSOS_SQUASHFS:-}" ]; then

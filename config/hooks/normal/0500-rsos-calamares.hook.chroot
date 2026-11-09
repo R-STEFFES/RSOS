@@ -1,31 +1,58 @@
 #!/bin/sh
 # RSOS 2.0 -- Calamares-Branding im Chroot
 #
-# calamares-settings-debian bringt einen Eintrag "Debian installieren" mit.
-# Der wird auf RSOS umgeschrieben. Das Branding selbst liegt schon unter
-# /etc/calamares/branding/rsos/ (aus config/includes.chroot).
+# calamares-settings-debian bringt einen Eintrag "Install Debian" mit. Der
+# heisst in trixie /usr/share/applications/calamares-install-debian.desktop --
+# NICHT install-debian.desktop, wie dieser Hook annahm. Er lief deshalb ins
+# Leere und der Eintrag blieb "Install Debian".
 #
-# Der alte Hook der 1.x-Reihe hat live-build selbst gepatcht
-# (firmwarelists.sh). Das ist mit live-build 20250505 nicht mehr noetig und
-# waere sogar schaedlich -- siehe docs/MIGRATION-1x-2x.md.
+# Die massgebliche Fassung liegt als Datei im Projekt
+# (config/includes.chroot/usr/share/applications/calamares-install-debian.desktop)
+# und ueberschreibt die Paketdatei beim Bauen. Dieser Hook sichert zusaetzlich
+# ab: er sucht ALLE passenden Eintraege und schreibt sie um. Aendert Debian den
+# Dateinamen, greift der Hook trotzdem.
+#
+# Der alte Hook der 1.x-Reihe hat live-build selbst gepatcht (firmwarelists.sh).
+# Das ist mit live-build 20250505 nicht mehr noetig und waere sogar schaedlich
+# -- siehe docs/MIGRATION-1x-2x.md.
 
 set -e
 
-DESKTOP=/usr/share/applications/install-debian.desktop
+gefunden=0
 
-if [ -e "${DESKTOP}" ]; then
+for eintrag in /usr/share/applications/*calamares*.desktop \
+               /usr/share/applications/*install*.desktop \
+               /usr/share/applications/kde/*calamares*.desktop; do
+	[ -e "${eintrag}" ] || continue
+
+	# .orig-Dateien sind Rueckstaende der Debian-Paketierung, nicht anfassen
+	case "${eintrag}" in
+	*.orig) continue ;;
+	esac
+
 	sed -i -e 's|^Name=.*|Name=RSOS installieren|' \
 	       -e 's|^GenericName=.*|GenericName=System auf die Festplatte installieren|' \
-	       -e 's|^Icon=.*|Icon=lava-lamp|' \
 	       -e 's|^Comment=.*|Comment=RSOS auf diesen Rechner installieren|' \
-	       "${DESKTOP}"
+	       -e 's|^Icon=.*|Icon=calamares|' \
+	       "${eintrag}"
+	echo "Calamares-Eintrag umgeschrieben: ${eintrag}"
+	gefunden=$((gefunden + 1))
+done
+
+if [ "${gefunden}" -eq 0 ]; then
+	echo "WARNUNG: kein Calamares-Eintrag in /usr/share/applications gefunden." >&2
+	echo "         Der Starter heisst dann weiterhin wie vom Paket vorgegeben." >&2
 fi
 
-# Gleicher Eintrag fuer das Anwendungsmenue unter dem RSOS-Namen
-if [ -e /usr/share/applications/calamares.desktop ]; then
+# Den Starter auf dem Schreibtisch des Live-Benutzers mitziehen, falls er
+# schon angelegt wurde (add-calamares-desktop-icon kopiert die Datei dorthin).
+for ziel in /home/*/Desktop/*calamares*.desktop \
+            /home/*/Schreibtisch/*calamares*.desktop \
+            /root/Desktop/*calamares*.desktop; do
+	[ -e "${ziel}" ] || continue
 	sed -i -e 's|^Name=.*|Name=RSOS installieren|' \
-	       -e 's|^Icon=.*|Icon=lava-lamp|' \
-	       /usr/share/applications/calamares.desktop
-fi
+	       -e 's|^Icon=.*|Icon=calamares|' \
+	       "${ziel}"
+done
 
 exit 0

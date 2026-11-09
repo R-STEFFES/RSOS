@@ -1,0 +1,83 @@
+/*
+ * RSOS 2.0 -- Calamares-Stylesheet
+ *
+ * Wird von Calamares automatisch geladen, wenn es im Branding-Verzeichnis
+ * liegt (hier: /etc/calamares/branding/rsos/stylesheet.qss). Es uebersteuert
+ * die Qt-Palette der Live-Sitzung.
+ *
+ * Warum das noetig ist: die Inhaltsflaechen folgen sonst dem Farbschema der
+ * Sitzung. Ist das dunkel, wird die Schrift in Calamares schwer lesbar. Hier
+ * stehen deshalb feste Farben nach den Markenvorgaben:
+ *
+ *     Grund    #FAFAF8  (Weiss)
+ *     Schrift  #0C0C0C  (Schwarz)
+ *     Akzent   #00E5FF  (Cyan)
+ *
+ * Die Seitenleiste (Schrittliste) laesst sich hier NICHT stylen -- sie hat
+ * einen eigenen C++-Delegate und kommt aus den style-Werten in branding.desc.
+ *
+ * Objektnamen stammen aus dem Beispiel-Stylesheet von Calamares
+ * (/usr/share/calamares/branding/default/stylesheet.qss).
+ */
+
+/* --- Fenster und Inhaltsflaeche: heller Grund, dunkle Schrift ------------ */
+#mainApp {
+    background-color: #FAFAF8;
+    color: #0C0C0C;
+}
+
+#mainApp QLabel,
+#mainApp QCheckBox,
+#mainApp QRadioButton,
+#mainApp QGroupBox,
+#mainApp QAbstractItemView,
+#mainApp QAbstractButton {
+    color: #0C0C0C;
+}
+
+/* --- Eingabefelder ------------------------------------------------------- */
+#mainApp QLineEdit,
+#mainApp QPlainTextEdit,
+#mainApp QTextEdit,
+#mainApp QSpinBox,
+#mainApp QComboBox {
+    background-color: #FFFFFF;
+    color: #0C0C0C;
+    border: 1px solid #C6C6C2;
+    border-radius: 3px;
+}
+
+/* --- Schaltflaechen ------------------------------------------------------ */
+#mainApp QPushButton {
+    background-color: #E9E9E6;
+    color: #0C0C0C;
+    border: 1px solid #C6C6C2;
+    border-radius: 3px;
+    padding: 6px 16px;
+}
+
+#mainApp QPushButton:hover {
+    background-color: #00E5FF;
+    border-color: #00E5FF;
+}
+
+#mainApp QPushButton:disabled {
+    color: #8A8A86;
+}
+
+/* --- Seitenleiste: dunkler Grund (Rest kommt aus branding.desc) ---------- */
+#sidebarApp {
+    background-color: #0C0C0C;
+}
+
+/* --- Fortschrittsbalken in Cyan ------------------------------------------ */
+#mainApp QProgressBar {
+    border: 1px solid #C6C6C2;
+    border-radius: 3px;
+    background-color: #FFFFFF;
+    color: #0C0C0C;
+}
+
+#mainApp QProgressBar::chunk {
+    background-color: #00E5FF;
+}

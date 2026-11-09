@@ -1,17 +1,37 @@
 ---
+# RSOS 2.0 -- Calamares-Branding
+#
+# ACHTUNG bei den style-Schluesseln: Calamares 3.3 (das in trixie) erwartet
+# sie in dieser Schreibweise. Die alten Namen sidebarBackground /
+# sidebarTextSelect / sidebarTextHighlight werden still ignoriert -- die
+# Seitenleiste bleibt dann farblos und die Schrift ist nicht lesbar.
+# Die Liste in der Seitenleiste laesst sich NICHT per QSS stylen (eigener
+# C++-Delegate), sie kommt ausschliesslich aus diesen vier Werten.
+#
+# Vergleich: /etc/calamares/branding/debian/branding.desc
+
 componentName:   rsos
 welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize:      900px,620px
+windowPlacement: center
 
 strings:
     productName:         RSOS
     shortProductName:    RSOS
     version:             2.0 Janina
     shortVersion:        2.0
-    versionedName:       RSOS
-    shortVersionedName:  RSOS
-    bootloaderEntryName: rsos
+    versionedName:       RSOS 2.0 Janina
+    shortVersionedName:  RSOS 2.0
+    bootloaderEntryName: RSOS
     productUrl:          https://steffes.industries/
- 
+    supportUrl:          https://steffes.industries/
+    knownIssuesUrl:      https://steffes.industries/
+    releaseNotesUrl:     https://steffes.industries/
+
+sidebar:    widget
+navigation: widget
 
 images:
     productLogo:         "sti-logo.png"
@@ -21,8 +41,9 @@ images:
 
 slideshow:               "show.qml"
 
+# Markenfarben: Schwarz #0C0C0C, Weiss #FAFAF8, Cyan #00E5FF
 style:
-   sidebarBackground:    "#292F34"
-   sidebarText:          "#FFFFFF"
-   sidebarTextSelect:    "#292F34"
-   sidebarTextHighlight: "#00E5FF"
+   SidebarBackground:        "#0C0C0C"
+   SidebarText:              "#FAFAF8"
+   SidebarTextCurrent:       "#00E5FF"
+   SidebarBackgroundCurrent: "#16181B"
