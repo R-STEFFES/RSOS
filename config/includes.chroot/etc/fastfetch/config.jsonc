@@ -1,0 +1,36 @@
+// fastfetch -- Systemuebersicht fuer RSOS
+//
+// Wird als Systemvorgabe aus /etc/fastfetch/config.jsonc gelesen, gilt also
+// fuer jeden Benutzer, solange er keine eigene Datei unter
+// ~/.config/fastfetch/config.jsonc anlegt.
+//
+// Das Logo ist keine der mitgelieferten Vorlagen, sondern die RSOS-Bildmarke
+// als Blockgrafik: scripts/make-neofetch-logo.py tastet die Silhouette von
+// assets/brand/monogram_white.png ab und schreibt sie hierher.
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "file",
+        "source": "/etc/fastfetch/sti-ascii.txt",
+        "padding": { "top": 0, "left": 2, "right": 5 }
+    },
+    "display": {
+        "separator": "  ",
+        "key": { "width": 15 },
+        "color": { "keys": "38;2;0;229;255" }
+    },
+    "modules": [
+        "title",
+        { "type": "os",      "key": "System" },
+        { "type": "kernel",  "key": "Kernel" },
+        { "type": "uptime",  "key": "Laufzeit" },
+        { "type": "packages","key": "Pakete" },
+        { "type": "shell",   "key": "Shell" },
+        { "type": "de",      "key": "Desktop" },
+        { "type": "icons",   "key": "Symbole" },
+        { "type": "cpu",     "key": "Prozessor" },
+        { "type": "memory",  "key": "Speicher" },
+        { "type": "disk",    "key": "Platte" },
+        { "type": "locale",  "key": "Sprache" }
+    ]
+}

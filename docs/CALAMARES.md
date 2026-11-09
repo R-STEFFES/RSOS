@@ -112,6 +112,53 @@ niedrig aufgelöst, 318×35).
 Farben: Grund `#0C0C0C`, Akzent `#00E5FF`, Speed-Slash als dünne Cyan-Linie mit
 Lücke um die Wortmarke.
 
+## Bootloader-Schritt: der `sed`-Fehler bei `/etc/default/grub`
+
+**Meldung während der Installation:**
+
+```
+sed: can't read /tmp/calamares-root-67v78vsd/etc/default/grub: No such file or directory
+```
+
+**Ursache:** Der Helfer `calamares-bootloader-config` schaltet vor dem Eintragen
+des Bootloaders mit `sed` die Suche nach anderen Betriebssystemen ein — in
+`${ZIEL}/etc/default/grub`. Diese Datei fehlte aber im Ziel, und zwar aus einem
+Grund, der nicht offensichtlich ist:
+
+> `/etc/default/grub` kommt in Debian aus `grub-pc` beziehungsweise `grub-efi`.
+> Diese beiden Metapakete **schließen sich gegenseitig aus** (`grub-efi-amd64
+> Conflicts: grub-pc`) und liegen deshalb nicht im Image — der Versuch, beide
+> vorzuinstallieren, hat den Bau einmal scheitern lassen. Die GRUB-Module und
+> Werkzeuge kommen aus `grub-pc-bin`, `grub-efi-amd64-bin` und `grub2-common`;
+> die Konfigurationsdatei bringt keines davon mit.
+
+**Behoben doppelt:**
+
+1. `config/includes.chroot/etc/default/grub` liegt jetzt im Live-System und
+   damit auch im Ziel (Wartezeit 5 s, `GRUB_DISTRIBUTOR="RSOS"`, `quiet`,
+   os-prober an).
+2. Der Helfer bricht nicht mehr ab: ist die Datei da, wird nur die
+   os-prober-Zeile gesetzt; fehlt sie, legt er sie an. `update-grub` darf
+   fehlschlagen — das Modul `bootloader` schreibt die Konfiguration direkt
+   danach ohnehin neu.
+
+**Nicht** die Lösung: `grub-pc` und `grub-efi` in die Paketliste aufnehmen
+(Konflikt, siehe oben).
+
+## Hintergrundbild
+
+`wallpaper.png` ist das Bild, das Calamares anzeigt — **von Raphael vorgegeben**,
+nicht errechnet. Es wird direkt ersetzt, nicht erzeugt.
+
+`scripts/make-calamares-artwork.py` erzeugt eine *alternative* Fassung in den
+Markenfarben und schreibt sie bewusst nach `wallpaper-marke.png`, damit sie ein
+erneuter Skriptlauf nicht überschreibt.
+
+## Startzeichen des Anwendungsstarters
+
+Siehe `docs/KDE-KONFIGURATION.md` — das Symbol kommt aus dem Symbolthema, nicht
+aus dem Branding-Ordner von Calamares.
+
 ## Noch offen
 
 * Die Bilder der Diashow (`show.qml`, `slide*.png`) sind noch im alten

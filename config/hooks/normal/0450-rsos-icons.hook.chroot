@@ -1,0 +1,93 @@
+#!/bin/sh
+# RSOS 2.0 -- Symbolthema mit der Bildmarke als Startzeichen
+#
+# WARUM UEBERHAUPT
+# ----------------
+# Das Startzeichen des KDE-Anwendungsstarters steht NICHT im Panel-Layout.
+# Das Plasmoid org.kde.plasma.kickoff hat in seiner Konfiguration
+#
+#     contents/config/main.xml -> <entry name="icon">
+#         <default>start-here-kde-symbolic</default>
+#
+# und zieht das Symbol aus dem Symbolthema. Ein eigenes Thema, das Breeze erbt
+# und genau diesen Namen mit der Bildmarke belegt, aendert also das Startzeichen
+# und sonst nichts. Genau so machen es die Distributionen.
+#
+# WARUM EIN EIGENES THEMA UND NICHT BREEZE UEBERSCHREIBEN
+# ------------------------------------------------------
+# Breeze gehoert dem Paket breeze-icons. Wer dessen Dateien ersetzt, beschädigt
+# die Paketintegritaet und verliert die Aenderung bei jedem Paket-Update. Ein
+# abgeleitetes Thema ist dagegen eine eigene, kleine Sammlung.
+#
+# Die Farbe kommt aus dem Thema: die Marke ist als SVG mit fill:currentColor
+# abgelegt (assets/brand/monogram_white.svg, erzeugt von
+# scripts/make-logo-svg.sh). KDE faerbt sie dadurch passend zum Farbschema --
+# auf einem dunklen Panel also hell, auf einem hellen dunkel.
+
+set -e
+
+QUELLE=/usr/share/icons/hicolor/scalable/apps/sti-logo.svg
+THEMA=/usr/share/icons/RSOS
+
+if [ ! -f "${QUELLE}" ]; then
+	echo "WARNUNG: ${QUELLE} fehlt -- Symbolthema wird nicht angelegt." >&2
+	echo "         Der Starter zeigt dann das Breeze-Symbol." >&2
+	exit 0
+fi
+
+# --- Verzeichnisse --------------------------------------------------------
+# Groessen wie bei Breeze, damit die Symbole in Panel, Menue und Starter
+# scharf sind.
+PLACES="16 22 24 32 48 64"
+APPLETS="22 24 32 48 64 256"
+
+# Die Namen, unter denen Plasma das Startzeichen sucht. start-here-kde-symbolic
+# ist die Vorgabe des Plasmoids; die uebrigen decken Menues und aeltere Pfade ab.
+NAMEN="start-here-kde-symbolic start-here-kde start-here-kde-plasma start-here"
+
+for groesse in ${PLACES}; do
+	mkdir -p "${THEMA}/places/${groesse}"
+	for name in ${NAMEN}; do
+		cp "${QUELLE}" "${THEMA}/places/${groesse}/${name}.svg"
+	done
+done
+
+for groesse in ${APPLETS}; do
+	mkdir -p "${THEMA}/applets/${groesse}"
+	cp "${QUELLE}" "${THEMA}/applets/${groesse}/org.kde.plasma.kickoff.svg"
+	cp "${QUELLE}" "${THEMA}/applets/${groesse}/org.kde.plasma.kickofflegacy.svg"
+done
+
+# --- index.theme ----------------------------------------------------------
+# Inherits sorgt dafuer, dass alles, was hier nicht liegt, aus Breeze kommt.
+# Ohne diesen Eintrag waere das System nach dem Setzen des Themas symbollos.
+{
+	echo "[Icon Theme]"
+	echo "Name=RSOS"
+	echo "Comment=RSOS-Symbole: Bildmarke als Startzeichen"
+	echo "Inherits=breeze-dark,breeze,hicolor"
+	echo
+	echo "Directories=$(for g in ${PLACES}; do printf 'places/%s,' "$g"; done \
+	                      | sed 's/,$//'),$(for g in ${APPLETS}; do printf 'applets/%s,' "$g"; done | sed 's/,$//')"
+	echo
+	for groesse in ${PLACES}; do
+		echo "[places/${groesse}]"
+		echo "Size=${groesse}"
+		echo "Context=Places"
+		echo "Type=Fixed"
+		echo
+	done
+	for groesse in ${APPLETS}; do
+		echo "[applets/${groesse}]"
+		echo "Size=${groesse}"
+		echo "Context=Applications"
+		echo "Type=Fixed"
+		echo
+	done
+} > "${THEMA}/index.theme"
+
+rm -f "${THEMA}/icon-theme.cache"
+command -v gtk-update-icon-cache >/dev/null 2>&1 &&
+	gtk-update-icon-cache -f -t "${THEMA}" >/dev/null 2>&1 || true
+
+echo "Symbolthema RSOS angelegt: $(find "${THEMA}" -name '*.svg' | wc -l) Symboldateien"

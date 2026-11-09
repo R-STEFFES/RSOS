@@ -42,3 +42,11 @@ luanti
 
 # --- Dateien und Netzlaufwerke ---------------------------------------------
 transmission-gtk
+
+# --- Systemuebersicht ------------------------------------------------------
+# Raphael wollte neofetch. Das gibt es in Debian 13 nicht mehr: das Projekt
+# wurde 2024 eingestellt und ist aus dem Archiv entfernt (apt-cache policy
+# neofetch -> kein Kandidat). fastfetch ist der gepflegte Nachfolger, kann
+# dieselbe Aufgabe und bringt eine eigene Bildmarke als Blockgrafik mit
+# (/etc/fastfetch/sti-ascii.txt, erzeugt von scripts/make-neofetch-logo.py).
+fastfetch

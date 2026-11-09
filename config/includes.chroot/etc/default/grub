@@ -1,0 +1,34 @@
+# RSOS 2.0 -- GRUB-Voreinstellungen
+#
+# Diese Datei gehoert ins Live-System, damit sie beim Installieren mit im Ziel
+# landet. Ohne sie scheitert der Bootloader-Schritt: Calamares' Helfer ruft
+# "update-grub" im Ziel auf, und grub-mkconfig liest /etc/default/grub. Fehlt
+# die Datei, bricht der Schritt mit
+#
+#     sed: can't read /tmp/calamares-root-XXXX/etc/default/grub: No such file
+#
+# ab. In Debian kommt sie aus grub-pc bzw. grub-efi; diese beiden Metapakete
+# schliessen sich gegenseitig aus und liegen deshalb nicht im Image -- also
+# bringt RSOS die Datei selbst mit.
+
+# Erstes Menueelement nach Ablauf der Wartezeit starten
+GRUB_DEFAULT=0
+
+# Fuenf Sekunden sind lang genug zum Eingreifen und kurz genug zum Durchstarten
+GRUB_TIMEOUT=5
+
+# Name, der im Startmenue und in der EFI-Eintragsliste erscheint
+GRUB_DISTRIBUTOR="RSOS"
+
+# Ruhiger Start: nur Fehlermeldungen des Kernels, kein Meldungsrauschen
+GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+
+# Zusaetzliche Kernelparameter fuer alle Eintraege
+GRUB_CMDLINE_LINUX=""
+
+# Nach anderen Betriebssystemen suchen (Windows, zweites Linux).
+# Noetig, damit ein vorhandenes System im Startmenue auftaucht.
+GRUB_DISABLE_OS_PROBER=false
+
+# Nur die Textkonsole als Ausgabegeraet -- auf Servern und in VMs verlaesslich
+GRUB_TERMINAL=console

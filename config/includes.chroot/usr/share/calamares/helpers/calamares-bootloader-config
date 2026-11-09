@@ -69,7 +69,30 @@ fi
 
 echo " * GRUB-Module und -Werkzeuge vorhanden"
 
-# os-prober wieder einschalten (wie im Original)
-sed -i "s/#GRUB_DISABLE_OS_PROBER=false/# OS_PROBER re-enabled by Debian Calamares installation:\nGRUB_DISABLE_OS_PROBER=false/g" "${CHROOT}/etc/default/grub"
+# os-prober wieder einschalten (wie im Original).
+#
+# Die Datei liegt seit RSOS 2.0 im Live-System und kommt damit auch im Ziel an
+# (config/includes.chroot/etc/default/grub). Der Waechter bleibt trotzdem: fehlt
+# sie, legt der Helfer sie an, statt mit
+#   sed: can't read .../etc/default/grub: No such file or directory
+# abzubrechen.
+GRUB_DATEI="${CHROOT}/etc/default/grub"
+if [ -f "${GRUB_DATEI}" ]; then
+	sed -i 's|^#\? *GRUB_DISABLE_OS_PROBER=.*|GRUB_DISABLE_OS_PROBER=false|' "${GRUB_DATEI}"
+else
+	echo " * Hinweis: ${GRUB_DATEI} fehlt -- wird angelegt."
+	cat > "${GRUB_DATEI}" <<'GRUBEOF'
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="RSOS"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=false
+GRUBEOF
+fi
 
-chroot "${CHROOT}" /usr/sbin/update-grub
+# update-grub ist kein Muss: das Calamares-Modul "bootloader" laeuft direkt
+# danach und schreibt die Konfiguration ohnehin neu. Ein Fehler hier darf die
+# Installation deshalb nicht abbrechen.
+chroot "${CHROOT}" /usr/sbin/update-grub ||
+	echo " * Hinweis: update-grub meldete einen Fehler. Das Modul bootloader schreibt die Konfiguration danach erneut."

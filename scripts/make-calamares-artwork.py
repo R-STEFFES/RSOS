@@ -20,7 +20,11 @@ Aufruf:
 
     python3 scripts/make-calamares-artwork.py
 
-Schreibt `wallpaper.png` nach config/includes.chroot/... -- das ist die einzige
+Schreibt `wallpaper-marke.png` nach config/includes.chroot/... und
+ABSICHTLICH NICHT `wallpaper.png`: das Bild, das Calamares anzeigt, hat Raphael
+vorgegeben (wallpaper.png im selben Ordner). Dieses Skript liefert nur eine
+alternative Fassung in den Markenfarben, damit sie nicht verloren geht -- die
+Marke als einzige
 massgebliche Fassung und landet beim Bauen im Image. (Eine zweite Kopie unter
 assets/calamares-branding/ gab es frueher; sie lief auseinander und wurde
 entfernt, damit niemand die falsche Datei bearbeitet.)
@@ -54,7 +58,7 @@ LOGO = os.path.join(PROJEKT, "assets/brand/wordmark_white.png")
 SCHRIFT = "/usr/share/fonts/Libre_Franklin/static/LibreFranklin-ExtraBold.ttf"
 
 ZIELE = [
-    os.path.join(PROJEKT, "config/includes.chroot/etc/calamares/branding/rsos/wallpaper.png"),
+    os.path.join(PROJEKT, "config/includes.chroot/etc/calamares/branding/rsos/wallpaper-marke.png"),
 ]
 
 

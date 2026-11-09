@@ -30,7 +30,7 @@ cat > /var/lib/AccountsService/users/rsos <<'EOF'
 [User]
 Session=plasma
 XSession=plasma
-Icon=/usr/share/icons/hicolor/scalable/apps/lava-lamp.svg
+Icon=/usr/share/icons/hicolor/scalable/apps/sti-logo.svg
 SystemAccount=false
 EOF
 
@@ -66,12 +66,19 @@ if [ -e /usr/share/backgrounds/rsos/Poly1-STI.png ]; then
 	fi
 fi
 
-# --- Deutsche Oberflaeche fuer neue Nutzer ---------------------------------
+# --- Symbole: Bildmarke als Startzeichen ------------------------------------
+# Das Startzeichen des KDE-Anwendungsstarters kommt aus dem Symbolthema, nicht
+# aus dem Panel-Layout (siehe 0450-rsos-icons.hook.chroot). Das Thema "RSOS"
+# erbt Breeze und belegt dort nur start-here-kde-symbolic mit der Bildmarke.
+# Als Vorgabe fuer neue Nutzer hier, zusaetzlich systemweit in /etc/xdg.
 mkdir -p /etc/skel/.config
 cat > /etc/skel/.config/kdeglobals <<'EOF'
 [General]
 ColorScheme=Breeze
 Name=RSOS
+
+[Icons]
+Theme=RSOS
 
 [KDE]
 LookAndFeelPackage=org.kde.breeze.desktop
@@ -82,6 +89,13 @@ widgetStyle=Breeze
 Country=de_DE
 Language=de_DE
 MeasureSystem=1
+EOF
+
+# Systemweite Vorgabe: greift auch fuer Konten, deren kdeglobals den Eintrag
+# nicht enthaelt (etwa den Live-Benutzer, falls /etc/skel nicht kopiert wurde).
+cat > /etc/xdg/kdeglobals <<'EOF'
+[Icons]
+Theme=RSOS
 EOF
 
 # --- Baloo (Dateiindex) im Live-Betrieb nicht noetig, spart Plattenlast ----
