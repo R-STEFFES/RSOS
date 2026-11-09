@@ -61,3 +61,7 @@
 *~
 *.swp
 .DS_Store
+
+# Python-Zwischenstaende
+__pycache__/
+*.pyc
