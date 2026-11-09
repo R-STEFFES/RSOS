@@ -10,7 +10,10 @@ set -e
 VERSION="$(cat /etc/rsos-version 2>/dev/null || echo 2.0)"
 
 # --- os-release ------------------------------------------------------------
-cat > /etc/os-release <<EOF
+# Nach /usr/lib/os-release schreiben und /etc/os-release darauf verlinken --
+# so wie Debian es selbst macht. Wer zuerst /etc/os-release schreibt und dann
+# verlinkt, ueberschreibt seinen eigenen Inhalt.
+cat > /usr/lib/os-release <<EOF
 PRETTY_NAME="RSOS ${VERSION}"
 NAME="RSOS"
 VERSION_ID="${VERSION}"

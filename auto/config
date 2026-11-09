@@ -16,6 +16,8 @@ cd "$(dirname "$0")/.."
 VERSION="$(cat VERSION)"
 NAME="RSOS-${VERSION}"
 DATE="$(date -u +%Y%m%d)"
+# Volumenname der ISO: Punkte sind dort nicht ueblich, also 2.0 -> 2_0
+VOLUME="RSOS$(printf '%s' "${VERSION}" | tr '.' '_')"
 
 lb config noauto \
 	--mode debian \
@@ -40,7 +42,7 @@ lb config noauto \
 	--iso-application "RSOS" \
 	--iso-preparer "Steffes Industries <https://steffes.industries/>" \
 	--iso-publisher "Steffes Industries <https://steffes.industries/>" \
-	--iso-volume "RSOS${VERSION//./_}" \
+	--iso-volume "${VOLUME}" \
 	--bootappend-live "boot=live components username=rsos hostname=rsos locales=de_DE.UTF-8 keyboard-layouts=de keyboard-model=pc105 timezone=Europe/Berlin quiet splash" \
 	--checksums sha512 \
 	--color

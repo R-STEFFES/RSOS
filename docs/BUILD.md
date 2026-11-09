@@ -225,7 +225,7 @@ für deinen Rechner braucht es keine.
 ## Stand
 
 * Die Konfiguration ist vollständig, aber **noch nicht gebaut**.
-* Alle 204 Paketnamen sind gegen den trixie-Index geprüft
+* Alle 220 Paketnamen sind gegen den trixie-Index geprüft
   (`scripts/check-packages.sh`): alle vorhanden. Entfernt wurden nur
   `zulucrypt-gui`/`zulumount-gui`, die es in trixie nicht mehr gibt.
 * Der rootless-Weg ist auf diesem Rechner bis zur Paket-Extraktion geprüft und

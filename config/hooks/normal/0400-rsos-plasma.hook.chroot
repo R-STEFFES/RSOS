@@ -38,6 +38,8 @@ EOF
 # Die Wandbilder liegen bereits unter /usr/share/backgrounds/rsos/.
 # Zusaetzlich als Plasma-Wandbildpaket, damit sie in den Systemeinstellungen
 # unter "Hintergrundbilder" auftauchen (nicht nur als Dateien).
+# Aufbau wie bei den offiziellen Plasma-Wandbildern: metadata.json plus
+# contents/images/<datei> und contents/screenshot.jpg.
 mkdir -p /usr/share/wallpapers/RSOS/contents/images
 cat > /usr/share/wallpapers/RSOS/metadata.json <<'EOF'
 {
@@ -47,14 +49,22 @@ cat > /usr/share/wallpapers/RSOS/metadata.json <<'EOF'
                 "Name": "Steffes Industries"
             }
         ],
-        "Description": "RSOS",
         "Id": "RSOS",
         "License": "GPL-3.0",
         "Name": "RSOS"
-    },
-    "X-KDE-PlasmaImageWallpaper": true
+    }
 }
 EOF
+
+# Ein Wandbild aus dem mitgelieferten Satz als Standardpaket-Bild
+if [ -e /usr/share/backgrounds/rsos/Poly1-STI.png ]; then
+	cp /usr/share/backgrounds/rsos/Poly1-STI.png \
+	   /usr/share/wallpapers/RSOS/contents/images/Poly1-STI.png
+	if command -v convert >/dev/null 2>&1; then
+		convert -resize 400x /usr/share/wallpapers/RSOS/contents/images/Poly1-STI.png \
+			/usr/share/wallpapers/RSOS/contents/screenshot.jpg 2>/dev/null || true
+	fi
+fi
 
 # --- Deutsche Oberflaeche fuer neue Nutzer ---------------------------------
 mkdir -p /etc/skel/.config

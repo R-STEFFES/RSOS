@@ -15,9 +15,15 @@ calamares-settings-debian
 # --- System und Paketverwaltung --------------------------------------------
 apt-utils
 bash-completion
+bzip2
 ca-certificates
+cpio
+dctrl-tools
 debconf
 dirmngr
+e2fsprogs
+file
+fdisk
 gnupg
 lsb-release
 man-db
@@ -26,8 +32,27 @@ rsync
 sudo
 tzdata
 unzip
+xz-utils
 zip
 zstd
+
+# --- Werkzeuge, die live-build im Chroot erwartet --------------------------
+# Ohne diese bricht der Bau beim Bootloader- bzw. ISO-Schritt mit
+# "Check_package" ab. Sie werden ausserdem fuer Bootsplash, EFI und Pruefsummen
+# gebraucht.
+fonts-dejavu-core
+grub-common
+grub-efi-amd64-bin
+grub-pc-bin
+isolinux
+isomd5sum
+librsvg2-bin
+mtools
+squashfs-tools
+syslinux-common
+syslinux-utils
+xorriso
+zsync
 
 # --- Hardware, Datentraeger, Dateisysteme ----------------------------------
 bleachbit
