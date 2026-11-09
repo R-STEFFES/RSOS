@@ -10,7 +10,7 @@
 #   ./scripts/build.sh --clean      # vorher alles aufraeumen
 #   ./scripts/build.sh --purge      # zusaetzlich den Paket-Cache leeren
 #
-# Ergebnis: out/rsos-2.0-<datum>-amd64.hybrid.iso
+# Ergebnis: RSOS-2.0-Janina-<datum>-amd64.hybrid.iso
 
 set -e
 
