@@ -1,0 +1,75 @@
+#!/bin/bash
+# RSOS 2.0 -- Ersatz fuer Debian's calamares-bootloader-config
+#
+# Original: /usr/share/calamares/helpers/calamares-bootloader-config aus
+# calamares-settings-debian. Dieses Skript ueberschreibt es im Image.
+#
+# WARUM
+# -----
+# Das Original ruft beim Installieren im Zielsystem auf:
+#
+#     chroot $CHROOT apt-get -y install grub-efi     (UEFI)
+#     chroot $CHROOT apt-get -y install grub-pc      (BIOS)
+#
+# Die RSOS-ISO bringt keinen Paketpool mit, und im Ziel gibt es keine
+# Netzquelle -- der Aufruf scheitert und die Installation bricht mit einem
+# Fehler zu "grub-pc" ab.
+#
+# Die Metapakete sind auch nicht beide installierbar: grub-efi-amd64
+# Conflicts: grub-pc. Ein Versuch, beide ins Live-System zu legen, hat den
+# Bau scheitern lassen.
+#
+# Gebraucht werden sie ohnehin nicht. Im Live-System -- und damit in der
+# Zielkopie -- liegen bereits:
+#
+#     /usr/lib/grub/i386-pc        (grub-pc-bin)
+#     /usr/lib/grub/x86_64-efi     (grub-efi-amd64-bin)
+#     grub-install, grub-mkconfig, grub-probe, update-grub  (grub2-common)
+#
+# Was hier fehlte, war nur der apt-Aufruf. Der eigentliche Eintrag des
+# Bootloaders passiert danach im Calamares-Modul "bootloader".
+#
+# Der LUKS-Teil des Originals installierte cryptsetup per apt. Die Pakete
+# stehen jetzt in der Paketliste, deshalb entfaellt auch dort der apt-Aufruf.
+
+CHROOT=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g")
+
+if [ -z "${CHROOT}" ]; then
+	echo " * FEHLER: Zielsystem nicht gefunden (kein /proc-Mount von Calamares)." >&2
+	exit 1
+fi
+
+# Vollverschluesselung: Rechte fuer die Initramfs setzen. Die Pakete
+# (cryptsetup, cryptsetup-initramfs, keyutils) liegen bereits im Ziel.
+if [ "$(mount | grep ${CHROOT}" " | cut -c -16)" = "/dev/mapper/luks" ]; then
+	echo " * Vollverschluesselung erkannt"
+	echo "UMASK=0077" > "${CHROOT}/etc/initramfs-tools/conf.d/initramfs-permissions"
+fi
+
+echo "Running bootloader-config..."
+
+if [ -d /sys/firmware/efi/efivars ]; then
+	ZIEL=x86_64-efi
+	echo " * UEFI -- GRUB-Module kommen aus grub-efi-amd64-bin"
+else
+	ZIEL=i386-pc
+	echo " * BIOS -- GRUB-Module kommen aus grub-pc-bin"
+fi
+
+if [ ! -d "${CHROOT}/usr/lib/grub/${ZIEL}" ]; then
+	echo " * FEHLER: ${CHROOT}/usr/lib/grub/${ZIEL} fehlt." >&2
+	echo "   Ohne die GRUB-Module kann der Bootloader nicht eingetragen werden." >&2
+	exit 1
+fi
+
+if [ ! -x "${CHROOT}/usr/sbin/grub-install" ]; then
+	echo " * FEHLER: ${CHROOT}/usr/sbin/grub-install fehlt (grub2-common)." >&2
+	exit 1
+fi
+
+echo " * GRUB-Module und -Werkzeuge vorhanden"
+
+# os-prober wieder einschalten (wie im Original)
+sed -i "s/#GRUB_DISABLE_OS_PROBER=false/# OS_PROBER re-enabled by Debian Calamares installation:\nGRUB_DISABLE_OS_PROBER=false/g" "${CHROOT}/etc/default/grub"
+
+chroot "${CHROOT}" /usr/sbin/update-grub

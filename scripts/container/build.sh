@@ -8,8 +8,10 @@
 #   ./scripts/container/build.sh --clean    # Arbeitsvolume wegwerfen
 #
 # --refresh ist der Weg, wenn sich Paketlisten, Includes oder Hooks geaendert
-# haben: das Arbeitsvolume mit dem fertigen Chroot bleibt liegen, aber die
-# Stufen, die davon abhaengen, laufen neu -- statt 2 GB neu zu laden.
+# haben: die Stufen, die davon abhaengen, laufen neu. Wirklich Zeit spart das
+# nur nach einem ABGEBROCHENEN Bau -- nach einem erfolgreichen raeumt live-build
+# seine Marker selbst weg. Der Paketcache bleibt in jedem Fall liegen, es wird
+# also nichts erneut heruntergeladen.
 #
 # Voraussetzung: docker mit laufendem Daemon. Bei Docker Desktop startet man ihn
 # ohne root mit:  systemctl --user start docker-desktop

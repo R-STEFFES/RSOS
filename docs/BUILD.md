@@ -95,8 +95,15 @@ Optionen:
 live-build merkt sich erledigte Stufen als Marker in `.build/` und würde sie
 sonst überspringen — die Änderung käme nie im Image an. Zurückgesetzt werden
 Paketlisten, Paketinstallation, Includes nach der Installation, Hooks und die
-ganze Binary-Stufe; der fertige Chroot bleibt liegen, die 2 GB Download
-entfallen.
+ganze Binary-Stufe.
+
+**Erwartung dämpfen:** live-build räumt die Marker der Chroot-Stufe nach einem
+erfolgreichen Bau selbst weg. Nach einem *abgeschlossenen* Bau findet
+`--refresh` also nichts mehr zum Wiederverwenden und die Paketinstallation
+läuft komplett neu. Der Paketcache (`cache/`, rund 2,5 GB) bleibt aber liegen —
+es wird nichts erneut heruntergeladen, nur neu entpackt und eingerichtet.
+Richtig Zeit spart der Schalter, wenn ein Bau **abgebrochen** ist: dann stehen
+die Marker noch und die fertigen Stufen bleiben unangetastet.
 
 ### Squashfs-Kompression
 

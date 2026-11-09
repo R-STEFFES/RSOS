@@ -55,19 +55,22 @@ xorriso
 zsync
 
 # --- Was der Installer im Zielsystem braucht -------------------------------
-# Calamares installiert den Bootloader ueber Debian's Helfer
-# calamares-bootloader-config, und der ruft im Ziel auf:
+# Debian's Helfer calamares-bootloader-config ruft im Ziel
+#     apt-get -y install grub-pc      (BIOS)  bzw.  grub-efi  (UEFI)
+# auf. Das kann offline nicht funktionieren (die ISO bringt keinen Paketpool
+# mit), und die beiden Metapakete schliessen sich ausserdem gegenseitig aus
+# (grub-efi-amd64 Conflicts grub-pc) -- sie koennen also nicht beide im
+# Live-System liegen. Ein erster Versuch, beide zu installieren, hat den Bau
+# genau daran scheitern lassen.
 #
-#     apt-get -y install grub-pc     (BIOS)  bzw.  grub-efi  (UEFI)
-#
-# Im Ziel gibt es keine Paketquelle (die ISO bringt keinen Paketpool mit), das
-# holt also nichts nach -- der Schritt bricht ab mit einem Fehler zu "grub-pc".
-# Sind die Metapakete dagegen schon im Live-System, liegt der Zielkopie alles
-# vor und apt meldet nur "already the newest version": nachgemessen, rc=0 auch
-# ganz ohne Paketlisten. grub-efi zieht efibootmgr mit.
-grub-pc
-grub-efi
+# RSOS ersetzt den Helfer deshalb (config/includes.chroot/usr/share/calamares/
+# helpers/calamares-bootloader-config) und braucht nur die Bausteine:
+#   Module            -> grub-pc-bin und grub-efi-amd64-bin (oben)
+#   Werkzeuge         -> grub-common und grub2-common (oben)
+#   EFI-Eintrag       -> efibootmgr
+#   LUKS-Fall         -> cryptsetup, cryptsetup-initramfs (unten), keyutils
 efibootmgr
+keyutils
 
 # --- Hardware, Datentraeger, Dateisysteme ----------------------------------
 bleachbit

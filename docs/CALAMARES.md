@@ -48,10 +48,10 @@ alle Treffer um.
 Als Symbol gibt es `calamares` (aus dem Calamares-Paket) — passend, weil die
 Marke kein eigenes Bildzeichen hat.
 
-## Fallstrick 3 — `grub-pc` muss im Live-System liegen
+## Fallstrick 3 — der Bootloader-Helfer ruft `apt` auf
 
-Debians Helfer `/usr/share/calamares/helpers/calamares-bootloader-config` ruft
-beim Installieren im Zielsystem auf:
+Debians Helfer `/usr/share/calamares/helpers/calamares-bootloader-config` macht
+beim Installieren im Zielsystem:
 
 ```bash
 if [ -d /sys/firmware/efi/efivars ]; then
@@ -62,13 +62,32 @@ fi
 ```
 
 Die RSOS-ISO bringt **keinen Paketpool** mit, und im Ziel gibt es keine
-Netzquelle — ohne die Pakete bricht die Installation mit einem Fehler zu
-`grub-pc` ab. Deshalb stehen `grub-pc`, `grub-efi` und `efibootmgr` in
-`config/package-lists/00-base.list.chroot`.
+Netzquelle — der Aufruf scheitert, die Installation bricht mit einem Fehler zu
+`grub-pc` ab.
 
-Nachgemessen: ist `grub-pc` bereits installiert, liefert
-`apt-get install -y grub-pc` auch **ganz ohne Paketlisten** `rc=0`
-(„already the newest version"). Die Metapakete im Live-System genügen also.
+**Die Metapakete sind keine Lösung:** `grub-efi-amd64` hat
+`Conflicts: grub-pc`. Beide ins Live-System zu legen, lässt schon den **Bau**
+scheitern (`E: Unable to correct problems, you have held broken packages`).
+Genau das ist einmal passiert.
+
+**Die Lösung:** RSOS überschreibt den Helfer
+(`config/includes.chroot/usr/share/calamares/helpers/calamares-bootloader-config`)
+und lässt den `apt`-Aufruf weg. Er prüft stattdessen, ob die Bausteine da sind:
+
+| Was | Paket | Ort |
+|---|---|---|
+| BIOS-Module | `grub-pc-bin` | `/usr/lib/grub/i386-pc` (304 Dateien) |
+| UEFI-Module | `grub-efi-amd64-bin` | `/usr/lib/grub/x86_64-efi` (286 Dateien) |
+| Werkzeuge | `grub2-common`, `grub-common` | `grub-install`, `grub-mkconfig`, `grub-probe`, `update-grub` |
+| EFI-Eintrag | `efibootmgr` | `/usr/bin/efibootmgr` |
+| LUKS | `cryptsetup`, `cryptsetup-initramfs`, `keyutils` | Paketliste |
+
+Alle liegen im Live-System und damit in der Zielkopie. Den Bootloader trägt
+danach das Calamares-Modul `bootloader` ein — der Helfer war nur für die
+Paketinstallation zuständig.
+
+Ändert Debian den Helfer, muss der Ersatz mitgezogen werden: der Vergleich ist
+`apt-get download calamares-settings-debian && dpkg-deb -x … `.
 
 ## Hintergrundbild neu erzeugen
 
