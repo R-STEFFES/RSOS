@@ -81,7 +81,7 @@ offen (`docs/ROADMAP.md`, Punkt 3).
 |---|---|
 | `assets/wallpapers/Poly*.png` | Wandbilder, jetzt in `config/includes.chroot/usr/share/backgrounds/rsos/` |
 | `assets/splash/` | Bootsplash für isolinux/GRUB |
-| `assets/calamares-branding/` | Branding-Vorlagen (Live-Kopie liegt in `config/`) |
+| `assets/calamares-branding/` | Branding-Vorlagen — **entfernt 2026-11-09**: die Kopien liefen von `config/includes.chroot/etc/calamares/` auseinander. Maßgeblich ist dort. |
 | `assets/icons/lava-lamp.*`, `sti-install.svg` | Programm-Icons |
 | `assets/legacy/launchers/*.desktop` | Vorlagen für Menüeinträge |
 | `assets/legacy/eznix-doc/` | Nachschlagewerk zur ursprünglichen Bauweise |

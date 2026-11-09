@@ -95,8 +95,8 @@ Paketinstallation zuständig.
 python3 scripts/make-calamares-artwork.py
 ```
 
-Schreibt `wallpaper.png` (1920×1080) nach `config/includes.chroot/...` und nach
-`assets/calamares-branding/...`. Farben und Wortmarke kommen aus
+Schreibt `wallpaper.png` (1920×1080) nach `config/includes.chroot/...` — der
+einzigen maßgeblichen Fassung. Farben und Wortmarke kommen aus
 `~/Schreibtisch/Videos/fundus/` (siehe `marke.md`): Grund `#0C0C0C`, Akzent
 `#00E5FF`, weiße Wortmarke, Speed-Slash als dünne Cyan-Linie mit Lücke um die
 Wortmarke.

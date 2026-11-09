@@ -15,8 +15,10 @@ Aufruf:
 
     python3 scripts/make-calamares-artwork.py
 
-Schreibt nach config/includes.chroot/... (das landet im Image) und zusaetzlich
-nach assets/calamares-branding/... (Rohmaterial).
+Schreibt `wallpaper.png` nach config/includes.chroot/... -- das ist die einzige
+massgebliche Fassung und landet beim Bauen im Image. (Eine zweite Kopie unter
+assets/calamares-branding/ gab es frueher; sie lief auseinander und wurde
+entfernt, damit niemand die falsche Datei bearbeitet.)
 """
 
 import math
@@ -48,7 +50,6 @@ SCHRIFT = "/usr/share/fonts/Libre_Franklin/static/LibreFranklin-ExtraBold.ttf"
 
 ZIELE = [
     os.path.join(PROJEKT, "config/includes.chroot/etc/calamares/branding/rsos/wallpaper.png"),
-    os.path.join(PROJEKT, "assets/calamares-branding/branding/rsos/wallpaper.png"),
 ]
 
 
