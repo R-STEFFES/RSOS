@@ -5,7 +5,12 @@ Erzeugt 1920x1080 nach den Markenvorgaben (siehe fundus/marke.md):
 
     Grund    #0C0C0C  (Schwarz)
     Akzent   #00E5FF  (Cyan, Hauptakzent)
-    Wortmarke weiss, aus fundus/logo/logo_white.png
+    Wortmarke weiss, aus assets/brand/wordmark_white.png
+
+Die Wortmarke ist die AKTUELLE Fassung: "STEFFES" mager und aufrecht mit
+Unterstrich, "INDUSTRIES" fett und kursiv mit Ueberstrich. Aeltere Kopien (z.B.
+Videos/fundus/logo/logo_white.png) haben beide Woerter im selben Gewicht und
+sind NICHT zu verwenden.
 
 Tron-Look: dunkler Grund, Cyan als Hauptakzent, sparsam. Die Wortmarke sitzt
 mittig, der Speed-Slash zieht als duenne Cyan-Linie dahinter durch -- mit einer
@@ -45,7 +50,7 @@ ZUFALL = random.Random(20261109)  # fester Startwert: gleiches Bild bei jedem La
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 PROJEKT = os.path.dirname(HIER)
-LOGO = os.path.expanduser("~/Schreibtisch/Videos/fundus/logo/logo_white.png")
+LOGO = os.path.join(PROJEKT, "assets/brand/wordmark_white.png")
 SCHRIFT = "/usr/share/fonts/Libre_Franklin/static/LibreFranklin-ExtraBold.ttf"
 
 ZIELE = [

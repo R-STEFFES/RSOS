@@ -96,10 +96,21 @@ python3 scripts/make-calamares-artwork.py
 ```
 
 Schreibt `wallpaper.png` (1920×1080) nach `config/includes.chroot/...` — der
-einzigen maßgeblichen Fassung. Farben und Wortmarke kommen aus
-`~/Schreibtisch/Videos/fundus/` (siehe `marke.md`): Grund `#0C0C0C`, Akzent
-`#00E5FF`, weiße Wortmarke, Speed-Slash als dünne Cyan-Linie mit Lücke um die
-Wortmarke.
+einzigen maßgeblichen Fassung.
+
+**Wortmarke:** `assets/brand/wordmark_white.png` im Projekt. Das ist die
+aktuelle Fassung — „STEFFES" **mager und aufrecht mit Unterstrich**,
+„INDUSTRIES" **fett und kursiv mit Überstrich**. Quelle ist
+`~/Schreibtisch/STI-Marketing/assets/logo/wordmark_white_scharf_2026-11.png`;
+dieselbe Datei benutzen die Produktionsskripte.
+
+**Nicht verwenden:** `Videos/fundus/logo/logo_white.png` und
+`LOGO GANZ.png` — dort stehen beide Wörter im selben Gewicht, das ist die alte
+Fassung. Ebenfalls nicht verwenden: `wordmark_white.png` aus dem Fundus (zu
+niedrig aufgelöst, 318×35).
+
+Farben: Grund `#0C0C0C`, Akzent `#00E5FF`, Speed-Slash als dünne Cyan-Linie mit
+Lücke um die Wortmarke.
 
 ## Noch offen
 
