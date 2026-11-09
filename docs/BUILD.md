@@ -105,6 +105,14 @@ es wird nichts erneut heruntergeladen, nur neu entpackt und eingerichtet.
 Richtig Zeit spart der Schalter, wenn ein Bau **abgebrochen** ist: dann stehen
 die Marker noch und die fertigen Stufen bleiben unangetastet.
 
+**Ein Fallstrick dabei:** live-build schreibt die Paketliste mit `>>` nach
+`chroot/root/packages.chroot` und leert die Datei nie
+(`usr/lib/live/build/chroot_package-lists`, Zeile 74). Auf einem frischen Chroot
+fällt das nicht auf — bei einem erneuten Lauf bleiben aber die **alten**
+Einträge stehen und werden mitinstalliert. Genau daran ist ein Bau gescheitert,
+nachdem `grub-pc`/`grub-efi` aus der Liste genommen waren: die gestrichenen
+Pakete standen noch in dieser Datei. `--refresh` löscht sie deshalb mit.
+
 ### Squashfs-Kompression
 
 Vorgabe ist `xz`: kleinste ISO, aber langsam und speicherhungrig — `mksquashfs`

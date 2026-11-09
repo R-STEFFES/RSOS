@@ -101,6 +101,13 @@ if [ "${1:-}" = "--refresh" ]; then
 		      chroot_install-packages.install chroot_install-packages.live \
 		      chroot_includes_after_packages chroot_hooks
 		rm -f binary_*
+		# WICHTIG: live-build schreibt die Paketliste mit ">>" in
+		# chroot/root/packages.chroot und leert sie nie. Auf einem neuen
+		# Chroot faellt das nicht auf -- hier wuerden alte Eintraege
+		# stehenbleiben und mitinstalliert werden (genau das hat einmal
+		# einen Bau mit "grub-pc" scheitern lassen).
+		rm -f /work/chroot/root/packages.chroot \
+		      /work/chroot/root/packages.foreign-architectures
 		echo "zurueckgesetzt: $(ls | tr "\n" " ")"'
 fi
 
