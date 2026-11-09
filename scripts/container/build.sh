@@ -89,6 +89,18 @@ echo "==> Quellen ins Arbeitsvolume kopieren"
 "$ENGINE" run --rm --privileged -v "$VOL":/work -v "$PROJECT":/src:ro \
 	"$IMAGE" /bin/sh -c 'cp -a /src/. /work/ && rm -rf /work/.git'
 
+# Eine Sperre aus einem abgebrochenen Lauf blockiert JEDEN weiteren Bau
+# ("lb chroot_devpts already locked"): live-build legt fuer jede Stufe eine
+# Datei .lock im Projektwurzelverzeichnis an und raeumt sie beim Abbruch nicht
+# weg. Bei einem frischen Volume kann das nicht passieren, bei --keep und
+# --refresh schon.
+if [ "${1:-}" = "--keep" ] || [ "${1:-}" = "--refresh" ]; then
+	if [ -n "$("$ENGINE" run --rm -v "$VOL":/work "$IMAGE" /bin/sh -c 'ls /work/.lock 2>/dev/null')" ]; then
+		echo "==> Sperre aus einem abgebrochenen Lauf entfernen (/work/.lock)"
+		"$ENGINE" run --rm -v "$VOL":/work "$IMAGE" /bin/sh -c 'rm -f /work/.lock'
+	fi
+fi
+
 # --refresh: die Stufen zuruecksetzen, die von geaenderten Paketlisten,
 # Includes oder Hooks abhaengen. live-build merkt sich erledigte Stufen als
 # Marker in .build/ und wuerde sie sonst ueberspringen -- die Aenderung kaeme
