@@ -157,17 +157,75 @@ neofetch selbst.
 ## Dunkles Farbschema
 
 Raphael wollte ein dunkles System. Gesetzt wird es in
-`config/hooks/normal/0400-rsos-plasma.hook.chroot`:
+`config/hooks/normal/0400-rsos-plasma.hook.chroot` — für `/etc/skel/.config/kdeglobals`
+(neue Konten) und `/etc/xdg/kdeglobals` (auch für Konten ohne eigenen Eintrag,
+etwa den Live-Benutzer).
 
-| Datei | Eintrag | Wirkung |
-|---|---|---|
-| `/etc/skel/.config/kdeglobals` | `ColorScheme=BreezeDark` | neue Konten |
-| `/etc/skel/.config/kdeglobals` | `LookAndFeelPackage=org.kde.breezedark.desktop` | Fenster, Leisten, Menüs |
-| `/etc/xdg/kdeglobals` | dieselben Werte | auch für Konten ohne eigenen Eintrag (etwa den Live-Benutzer) |
+**Wichtig — der Name des Schemas genügt nicht.** `ColorScheme=BreezeDark` sagt
+Plasma, welches Schema gilt. **Qt-Programme** holen ihre Farben aber aus den
+`[Colors:…]`-Gruppen derselben Datei. Fehlen die, bekommt ein Qt-Programm die
+helle Standardpalette — genau daran scheiterte der Installer (siehe
+`docs/CALAMARES.md`, „Die zweite Ursache: die Farbpalette").
+
+Der Hook nimmt die Werte deshalb direkt aus `/usr/share/color-schemes/BreezeDark.colors`
+und schreibt sie mit:
+
+| Aus dem Schema übernommen | Zweck |
+|---|---|
+| `[ColorEffects:Disabled]`, `[ColorEffects:Inactive]` | ausgegraute Elemente |
+| `[Colors:Button]`, `[Colors:View]`, `[Colors:Window]`, `[Colors:Selection]`, `[Colors:Tooltip]`, `[Colors:Complementary]`, `[Colors:Header]` | die eigentliche Palette |
+| `[WM]` | Farben des Fensterrahmens |
+
+Die `[General]`-Gruppe des Schemas wird bewusst **nicht** übernommen — sonst
+überschreibt sie unsere Einträge.
 
 `Breeze` (ohne Zusatz) ist die **helle** Fassung — die stand dort vorher.
-Vorhanden sind beide: `/usr/share/color-schemes/BreezeDark.colors` und
-`/usr/share/plasma/look-and-feel/org.kde.breezedark.desktop`.
+
+## Standard-Hintergrund und Look-and-Feel
+
+Der Standard-Hintergrund kommt aus dem **Look-and-Feel-Paket**: dessen Datei
+`contents/defaults` enthält `[Wallpaper] Image=…`. Bei KDEs Breeze Dark steht
+dort `Image=Next`.
+
+RSOS bringt deshalb ein eigenes Paket mit:
+
+```
+usr/share/plasma/look-and-feel/org.kde.rsos.desktop/
+    metadata.json        KPackageStructure: Plasma/LookAndFeel
+    contents/defaults    Farbschema, Symbole, Fensterdekoration, [Wallpaper]
+```
+
+Warum ein eigenes Paket und nicht das von KDE ändern: die Dateien von
+`org.kde.breezedark.desktop` gehören dem Paket `plasma-workspace` — Änderungen
+daran beschädigen die Paketintegrität und sind beim nächsten Update weg.
+
+Es gibt **kein** `contents/layouts/` — dann baut Plasma seine gewohnte
+Standardleiste. Das Plasma-Layout wird weiterhin nicht erfunden, sondern später
+per `capture-kde-config.sh` abgezogen.
+
+`LookAndFeelPackage=org.kde.rsos.desktop` steht in beiden `kdeglobals`-Dateien.
+
+## Weltraum-Wandbilder
+
+Vier neue Hintergründe, erzeugt von `scripts/make-wallpapers.py` (2560×1440,
+gerechnet — kein fremdes Bildmaterial, fester Zufallsstartwert):
+
+```
+usr/share/backgrounds/rsos/weltraum/weltraum-1…4.png    die Bilder
+usr/share/wallpapers/RSOS-Weltraum/                     Wandbildpaket für die
+    metadata.json, contents/images/, contents/screenshot.jpg   Systemeinstellungen
+```
+
+Variante 1 ist der **Standard** (im LNF-Paket eingetragen): blauer Nebel mit
+einem Planeten am unteren Rand und Cyan-Randlicht. Variante 2 violett, 3 türkis,
+4 die ruhige — fast schwarz mit dünnem Cyan-Horizont, Orange nur als kurzer
+Strich (so will es die Markenvorgabe: Orange ist Nebenakzent).
+
+Das Vorschaubild für die Systemeinstellungen schreibt Pillow als JPEG mit —
+ImageMagick wird nicht mehr gebraucht.
+
+Die Calamares-Slides benutzen dieselben Bilder als Grundlage
+(`scripts/make-calamares-slides.py`).
 
 ## Was wohin gehört
 

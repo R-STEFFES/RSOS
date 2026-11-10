@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Steffes Industries"
+            }
+        ],
+        "Id": "RSOS-Weltraum",
+        "License": "GPL-3.0",
+        "Name": "RSOS Weltraum",
+        "Name[de]": "RSOS Weltraum"
+    }
+}

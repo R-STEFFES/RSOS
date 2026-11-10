@@ -1,0 +1,45 @@
+# RSOS 2.0 -- Vorgaben des eigenen Look-and-Feel-Pakets
+#
+# Aufbau wie bei /usr/share/plasma/look-and-feel/org.kde.breezedark.desktop/
+# contents/defaults, aber mit unseren Werten. Plasma liest diese Datei beim
+# ersten Anmelden eines Benutzers und uebernimmt daraus Farbschema, Symbole,
+# Fensterdekoration und -- entscheidend -- den Standard-Hintergrund.
+#
+# WARUM EIN EIGENES PAKET UND NICHT DAS VON KDE AENDERN
+# -----------------------------------------------------
+# Die Dateien von org.kde.breezedark.desktop gehoeren dem Paket
+# plasma-workspace. Wer sie ueberschreibt, beschaedigt die Paketintegritaet und
+# verliert die Aenderung beim naechsten Update. Ein eigenes Paket ist eine
+# eigene, kleine Sammlung -- genau wie beim Symbolthema RSOS.
+#
+# Es gibt bewusst KEIN contents/layouts/: dann baut Plasma seine gewohnte
+# Standardleiste. Das Plasma-Layout wird weiterhin nicht erfunden, sondern
+# spaeter mit scripts/capture-kde-config.sh von einem eingerichteten System
+# abgezogen (siehe docs/KDE-KONFIGURATION.md).
+
+[kdeglobals][KDE]
+widgetStyle=Breeze
+
+[kdeglobals][General]
+ColorScheme=BreezeDark
+
+[kdeglobals][Icons]
+Theme=RSOS
+
+[plasmarc][Theme]
+name=default
+
+# Standard-Hintergrund: das erste Weltraum-Bild.
+# Erzeugt von scripts/make-wallpapers.py.
+[Wallpaper]
+Image=/usr/share/wallpapers/RSOS-Weltraum/contents/images/weltraum-1.png
+
+[kcminputrc][Mouse]
+cursorTheme=breeze_cursors
+
+[kwinrc][org.kde.kdecoration2]
+library=org.kde.breeze
+theme=Breeze
+
+[KSplash]
+Theme=org.kde.Breeze

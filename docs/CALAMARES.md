@@ -140,6 +140,30 @@ Jetzt gilt in `stylesheet.qss`:
 C++-Delegate; ihre Farben kommen ausschließlich aus den `style:`-Werten in
 `branding.desc`.
 
+### Die zweite Ursache: die Farbpalette
+
+Raphael: „Der Hintergrund bei der Partitionierung ist ein fast weißes Feld und
+dann bei weißer Schrift."
+
+Die Partitionsseite benutzt eine eigene Ansichtsklasse
+(`PartitionView`, ein `QTreeView`) und **zeichnet ihren Grund aus der
+Farbpalette** — nicht aus dem Stylesheet. Eine QSS-Regel färbt dort nur die
+Schrift.
+
+Und die Palette war hell, obwohl das System dunkel eingestellt war. Grund:
+
+> `ColorScheme=BreezeDark` in der `kdeglobals` genügt **nicht**. Plasma liest
+> daraus das Schema; **Qt-Programme** — und Calamares ist eines — holen ihre
+> Palette aus den `[Colors:…]`-Gruppen derselben Datei. Fehlen die, gilt die
+> helle Standardpalette.
+
+Deshalb nimmt
+`config/hooks/normal/0400-rsos-plasma.hook.chroot` die Farbwerte jetzt direkt
+aus `/usr/share/color-schemes/BreezeDark.colors` und schreibt sie in die
+`kdeglobals` (für `/etc/skel` und `/etc/xdg`) — so bleiben sie richtig, wenn
+Debian das Schema ändert. Zusätzlich decken neue QSS-Regeln `PartitionView`,
+`QTreeView`, `QListView`, `QTableView` und `QAbstractScrollArea` ab.
+
 > **Kachelung:** Calamares kachelt Bilder, die nicht fenstergroß sind
 > (`windowSize: 900px,620px`). Angezeigt wird Raphaels Bild unverändert
 > (`wallpaper.png`, 1920×1080). Daneben liegt die auf Fenstergröße gebrachte
@@ -197,11 +221,59 @@ erneuter Skriptlauf nicht überschreibt.
 Siehe `docs/KDE-KONFIGURATION.md` — das Symbol kommt aus dem Symbolthema, nicht
 aus dem Branding-Ordner von Calamares.
 
+## grub-install scheitert mit Rückgabewert 1 (BIOS-Modus)
+
+**Meldung:** `grub-install -target=i386-pc --recheck --force /dev/sda` → Fehlercode 1.
+
+Nachgestellt im Container gegen Testplatten — die Ursache ist eindeutig:
+
+| Platte | Ergebnis |
+|---|---|
+| GPT **mit** BIOS-Startpartition | Erfolg |
+| GPT **ohne** BIOS-Startpartition | `warning: this GPT partition label contains no BIOS Boot Partition; embedding won't be possible` → `error: embedding is not possible, but this is required for cross-disk install` → **1** |
+| MBR (msdos) | Erfolg |
+
+**Was das heißt:** GRUB braucht im BIOS-Betrieb auf einer GPT-Platte eine kleine,
+unformatierte Partition vom Typ `bios_grub` (8 MiB), in die es seinen
+Zwischencode schreiben kann. Fehlt sie, bricht die Installation ab — obwohl
+`grub-install` vorhanden ist und alle GRUB-Module im Ziel liegen (276 Dateien
+unter `/usr/lib/grub/i386-pc`, geprüft).
+
+**Ursache im Testlauf:** Die virtuelle Platte trug noch eine GPT-Tabelle aus
+einem früheren Versuch. Calamares legt die BIOS-Startpartition nur an, wenn es
+die Partitionstabelle **selbst neu schreibt**.
+
+**Abhilfe:**
+
+* In der VM die Platte vorher leeren bzw. im Installer **„Festplatte löschen"**
+  wählen — dann schreibt Calamares die Tabelle neu, samt BIOS-Startpartition.
+* Bei **manueller** Partitionierung auf einer GPT-Platte selbst eine 8 MiB
+  große, unformatierte Partition mit der Markierung „BIOS-GRUB" anlegen.
+* Alternative ohne BIOS-Startpartition: die Platte mit einer **MBR**-Tabelle
+  (msdos) versehen oder die VM im **UEFI**-Modus starten (dann wird
+  `--target=x86_64-efi` benutzt und eine EFI-Partition gebraucht).
+
+Am Image ist dafür nichts zu ändern — `grub2-common`, `grub-pc-bin` und
+`grub-efi-amd64-bin` liegen vollständig drin.
+
+## Diashow-Bilder
+
+Die vier Slides tragen jetzt die aktuelle Wortmarke und deutsche Sprüche statt
+der alten grünen Flächen. Erzeugt von `scripts/make-calamares-slides.py`
+(1920×1200, wie zuvor), Grundlage sind Ausschnitte aus den Weltraum-Wandbildern
+— Installer und Schreibtisch gehören damit sichtbar zusammen.
+
+Sprüche: „Freiheit fängt beim System an." · „Schlank. Schnell. Sauber." ·
+„Wir setzen die Standards von morgen." · „Dein System. Deine Regeln."
+
+Die Bildmarke steht als sehr blasses Wasserzeichen rechts; die Wortmarke oben
+links mit dem Cyan-Strich darüber. Schrift ist Libre Franklin (Markenvorgabe).
+
 ## Noch offen
 
-* Die Bilder der Diashow (`show.qml`, `slide*.png`) sind noch im alten
-  lila/orangen Stil. Raphael wollte sie vorerst lassen.
-* `welcome.png` und `slide_cs.png` (Willkommensseite) ebenfalls.
+* `welcome.png` und `slide_cs.png` (Willkommensseite) zeigen einen Laptop mit
+  dem alten lila Vieleck-Hintergrund. Die Wortmarke darin ist **korrekt**, nur
+  der Hintergrund passt nicht mehr zum Weltraum-Stil. Auf Wunsch ersetzbar.
 * `bootloader.conf` enthält die Pfade `/vmlinuz-linux` und
   `/initramfs-linux.img` — das ist **Debians eigene Vorgabe**, keine
   Arch-Vorlage. Debian korrigiert sie zur Laufzeit über das Modul

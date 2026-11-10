@@ -44,13 +44,20 @@ jemandem in die Hand drücken kann, ohne 40 Anwendungen zu erklären.
 * Büro: LibreOffice (Writer, Calc, Impress, Draw)
 * Mail: Thunderbird
 * Videoschnitt: Kdenlive
-* Medienwiedergabe: MPV
-* Grafik: Inkscape, ImageMagick
+* Medienwiedergabe: MPV (Celluloid ist jetzt der Videoplayer)
+* Musik: Audacious samt Plugins, SoundConverter („Klangumwandler")
+* Grafik: Inkscape, ImageMagick, GIMP
 * Sicherheit: KeePassXC samt Browser-Anbindung
+* Netz: FileZilla, Remmina
+* Dateien: Transmission (BitTorrent), BleachBit
+* Terminal: xterm (das Paket liefert UXTerm)
+
+**GParted bleibt** — Raphael wollte es ausdrücklich behalten, als Werkzeug für
+später. Die Partitionierung während der Installation macht ohnehin Calamares.
 
 Diese Pakete stehen in keiner Liste mehr; die Begründung steht als Kommentar in
-`config/package-lists/20-apps.list.chroot`, damit sie nicht versehentlich wieder
-auftauchen.
+`config/package-lists/20-apps.list.chroot` und `00-base.list.chroot`, damit sie
+nicht versehentlich wieder auftauchen.
 
 ## Was nicht mehr drin ist
 

@@ -80,7 +80,7 @@ efibootmgr
 keyutils
 
 # --- Hardware, Datentraeger, Dateisysteme ----------------------------------
-bleachbit
+# bleachbit wurde am 2026-11-10 auf Wunsch von Raphael entfernt.
 btrfs-progs
 cifs-utils
 cryptsetup
@@ -111,11 +111,9 @@ xfsprogs
 
 # --- Netz und Fernzugriff --------------------------------------------------
 curl
-filezilla
 openssh-client
 openvpn
 network-manager-openvpn-gnome
-remmina
 smbclient
 wget
 
@@ -127,7 +125,8 @@ xauth
 xclip
 xdg-utils
 xinit
-xterm
+# xterm wurde am 2026-11-10 entfernt (Raphael wollte UXTerm weg -- das steckt
+# in diesem Paket). Konsole ist weiterhin der Terminal-Emulator.
 xdg-desktop-portal
 xdg-desktop-portal-gtk
 

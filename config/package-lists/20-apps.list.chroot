@@ -10,49 +10,59 @@ hunspell-de-de
 mythes-de
 
 # --- Multimedia ------------------------------------------------------------
-audacious
-audacious-plugins
+# Celluloid ist der Videoplayer (Raphael, 2026-11-10). MPV als eigenes Programm
+# wurde entfernt, Celluloid benutzt ihn als Unterbau -- libmpv kommt also mit.
+celluloid
 ffmpeg
 gstreamer1.0-libav
 gstreamer1.0-plugins-bad
 gstreamer1.0-plugins-good
 gstreamer1.0-plugins-ugly
 lame
-soundconverter
 sox
 
 # --- Grafik ----------------------------------------------------------------
-gimp
+# Kein eigenes Grafikprogramm mehr; Gwenview und Spectacle kommen mit Plasma.
 
 # --- Auf Wunsch von Raphael entfernt (2026-11-10) --------------------------
 # Diese Pakete standen hier und sollen NICHT wieder aufgenommen werden:
 #
+#   audacious, audacious-plugins   Musikwiedergabe
+#   soundconverter                 Klangumwandler
+#   gimp                           Bildbearbeitung
+#   transmission-gtk               BitTorrent
+#   bleachbit, filezilla, remmina  (standen in 00-base)
+#   xterm                          (UXTerm, stand in 00-base)
 #   libreoffice-calc, -draw, -impress, -writer, -gtk3, -l10n-de,
-#   -style-breeze      Buerosuite
+#   -style-breeze                  Buerosuite
 #   thunderbird, thunderbird-l10n-de        Mailprogramm
-#   kdenlive           Videoschnitt
-#   mpv                Medienwiedergabe
-#   inkscape, imagemagick                   Grafikwerkzeuge
+#   kdenlive                       Videoschnitt
+#   mpv                            Medienwiedergabe
+#   inkscape, imagemagick          Grafikwerkzeuge
 #   keepassxc, webext-keepassxc-browser     (standen in 00-base)
 #
-# Was zum Abspielen und Umwandeln gebraucht wird, bleibt: audacious, ffmpeg,
-# die GStreamer-Saetze, lame, soundconverter, sox.
+# GParted BLEIBT (Raphael wollte es ausdruecklich behalten, als Werkzeug fuer
+# spaeter). Was zum Abspielen und Umwandeln gebraucht wird, bleibt ebenfalls:
+# Celluloid, ffmpeg, die GStreamer-Saetze, lame, sox.
 #
 # Achtung bei imagemagick: der Plasma-Hook (0400-rsos-plasma.hook.chroot)
-# erzeugt damit ein Vorschaubild fuer das Wandbildpaket. Der Aufruf ist
-# abgesichert und wird ohne ImageMagick einfach uebersprungen -- das Wandbild
-# selbst erscheint trotzdem, nur ohne Vorschaubild in den Systemeinstellungen.
+# erzeugt damit ein Vorschaubild fuer das Wandbildpaket RSOS. Der Aufruf ist
+# abgesichert und wird ohne ImageMagick uebersprungen -- das Wandbild selbst
+# erscheint trotzdem, nur ohne Vorschaubild in den Systemeinstellungen. Die
+# Weltraum-Wandbilder bringen ihr Vorschaubild dagegen mit
+# (scripts/make-wallpapers.py schreibt es mit Pillow).
 
 # --- Spiele und Freizeit ---------------------------------------------------
 luanti
 
 # --- Dateien und Netzlaufwerke ---------------------------------------------
-transmission-gtk
+# transmission-gtk (BitTorrent) wurde am 2026-11-10 entfernt.
 
 # --- Systemuebersicht ------------------------------------------------------
-# Raphael wollte neofetch. Das gibt es in Debian 13 nicht mehr: das Projekt
-# wurde 2024 eingestellt und ist aus dem Archiv entfernt (apt-cache policy
-# neofetch -> kein Kandidat). fastfetch ist der gepflegte Nachfolger, kann
-# dieselbe Aufgabe und bringt eine eigene Bildmarke als Blockgrafik mit
-# (/etc/fastfetch/sti-ascii.txt, erzeugt von scripts/make-neofetch-logo.py).
+# Raphael wollte neofetch. In Debian 13 gibt es das Paket nicht mehr (2024
+# eingestellt, aus dem Archiv entfernt). Es kommt deshalb als Programm aus dem
+# letzten Debian-Paket (7.1.0-4 aus Debian 12) ins Image --
+# scripts/fetch-neofetch.sh laedt es, prueft die Pruefsumme und ergaenzt die
+# Bildmarke. Es kommt KEINE zusaetzliche Paketquelle ins Image.
+# fastfetch bleibt als gepflegte Alternative installiert.
 fastfetch

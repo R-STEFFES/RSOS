@@ -68,44 +68,48 @@ fi
 
 # --- Dunkles Farbschema -----------------------------------------------------
 # Raphael wollte ein dunkles System. BreezeDark faerbt Fenster, Leisten, Menues
-# und den Sperrbildschirm dunkel mit hellem Text; das Farbschema "Breeze" (ohne
-# Zusatz) ist die helle Fassung.
+# und den Sperrbildschirm dunkel mit hellem Text; "Breeze" (ohne Zusatz) ist die
+# helle Fassung.
 #
-# Als Vorgabe fuer neue Nutzer hier, zusaetzlich systemweit in /etc/xdg.
-# Vorsicht beim Abziehen des Plasma-Layouts: capture-kde-config.sh kopiert
-# kdeglobals vom Testrechner -- Farbschema und Symbolthema danach pruefen.
+# WICHTIG: "ColorScheme=BreezeDark" allein reicht NICHT.
+# -----------------------------------------------
+# Plasma liest daraus das Schema. Qt-Programme -- und Calamares ist eines --
+# holen ihre Palette dagegen aus den [Colors:...]-Gruppen der kdeglobals.
+# Fehlen die, bekommt Calamares die helle Standardpalette, obwohl das System
+# dunkel eingestellt ist. Genau daran lag die fast weisse Flaeche auf der
+# Partitionierungsseite: sie zeichnet ihren Grund aus der Palette, meine
+# Stylesheet-Regel faerbte nur die Schrift -- weiss auf weiss.
+#
+# Die Farbwerte werden deshalb aus dem Farbschema des Systems uebernommen. So
+# bleiben sie richtig, wenn Debian das Schema aendert.
+SCHEMA=/usr/share/color-schemes/BreezeDark.colors
+
+kdeglobals_schreiben() {
+	{
+		printf '[General]\nColorScheme=BreezeDark\nName=RSOS\n\n'
+		printf '[Icons]\nTheme=RSOS\n\n'
+		printf '[KDE]\nLookAndFeelPackage=org.kde.rsos.desktop\nSingleClick=false\nwidgetStyle=Breeze\n\n'
+		printf '[Locale]\nCountry=de_DE\nLanguage=de_DE\nMeasureSystem=1\n\n'
+		if [ -f "${SCHEMA}" ]; then
+			# Farbgruppen des Schemas ([ColorEffects:*], [Colors:*]), ohne
+			# dessen eigene [General]-Gruppe -- sonst ueberschreibt sie
+			# unsere Eintraege.
+			sed -n '/^\[ColorEffects:/,/^\[General\]/p' "${SCHEMA}" | sed '$d'
+			# Fensterrahmenfarben dazu
+			sed -n '/^\[WM\]/,$p' "${SCHEMA}"
+		else
+			echo "# ${SCHEMA} fehlt -- es gilt die Standardpalette." >&2
+		fi
+	}
+}
+
 mkdir -p /etc/skel/.config
-cat > /etc/skel/.config/kdeglobals <<'EOF'
-[General]
-ColorScheme=BreezeDark
-Name=RSOS
-
-[Icons]
-Theme=RSOS
-
-[KDE]
-LookAndFeelPackage=org.kde.breezedark.desktop
-SingleClick=false
-widgetStyle=Breeze
-
-[Locale]
-Country=de_DE
-Language=de_DE
-MeasureSystem=1
-EOF
+kdeglobals_schreiben > /etc/skel/.config/kdeglobals
 
 # Systemweite Vorgabe: greift auch fuer Konten, deren kdeglobals die Eintraege
 # nicht enthaelt (etwa den Live-Benutzer, falls /etc/skel nicht kopiert wurde).
-cat > /etc/xdg/kdeglobals <<'EOF'
-[General]
-ColorScheme=BreezeDark
-
-[Icons]
-Theme=RSOS
-
-[KDE]
-LookAndFeelPackage=org.kde.breezedark.desktop
-EOF
+mkdir -p /etc/xdg
+kdeglobals_schreiben > /etc/xdg/kdeglobals
 
 # --- Baloo (Dateiindex) im Live-Betrieb nicht noetig, spart Plattenlast ----
 mkdir -p /etc/xdg/baloo
