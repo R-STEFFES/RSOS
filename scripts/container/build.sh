@@ -92,6 +92,24 @@ if [ "${1:-}" = "--shell" ]; then
 	exit 0
 fi
 
+# Jede Ausgabe bekommt eine eigene Nummer (2.0.1, 2.0.2, ...) und wird NICHT
+# ueberschrieben. Der Name kommt aus VERSION und CODENAME, also aus dem
+# Projekt -- deshalb hier dieselbe Rechnung wie in auto/config.
+#
+# Frueher stand nur das Datum im Namen: zwei Laeufe am selben Tag haben sich
+# gegenseitig ersetzt. Raphael will die Ausgaben nebeneinander behalten, um
+# Fassungen vergleichen zu koennen.
+AUSGABE="out/RSOS-$(cat VERSION)-$(cat CODENAME)-$(date -u +%Y%m%d)-amd64.hybrid.iso"
+if [ -e "$AUSGABE" ]; then
+	echo >&2
+	echo "FEHLER: ${AUSGABE} gibt es schon." >&2
+	echo "Bitte VERSION hochzaehlen (aktuell: $(cat VERSION)), zum Beispiel auf" >&2
+	echo "$(awk -F. '{printf "%s.%s.%d\n", $1, $2, $3+1}' VERSION)," >&2
+	echo "damit die vorhandene Ausgabe erhalten bleibt." >&2
+	echo >&2
+	exit 1
+fi
+
 echo "==> Quellen ins Arbeitsvolume kopieren"
 "$ENGINE" run --rm --privileged -v "$VOL":/work -v "$PROJECT":/src:ro \
 	"$IMAGE" /bin/sh -c 'cp -a /src/. /work/ && rm -rf /work/.git'
@@ -204,10 +222,10 @@ for f in out/*.iso; do
 	fi
 done
 
-# Zusaetzlich nach ~/Downloads -- dort liegen die anderen Testimages.
-if [ -d "${HOME}/Downloads" ]; then
-	for f in out/*.iso; do
-		[ -e "$f" ] || continue
-		cp -v "$f" "${HOME}/Downloads/"
-	done
+# Nur die NEUESTE Ausgabe nach ~/Downloads kopieren -- dort liegen die
+# Testimages. Aeltere Ausgaben bleiben in out/ und werden nicht angefasst;
+# seit der Nummerierung liegen sie ohnehin unter eigenen Namen.
+neueste="$(ls -t out/*.iso 2>/dev/null | head -1)"
+if [ -n "$neueste" ] && [ -d "${HOME}/Downloads" ]; then
+	cp -v "$neueste" "${HOME}/Downloads/"
 fi

@@ -101,11 +101,45 @@ class Qemu:
         time.sleep(0.4)
 
     def tippen(self, text):
-        """Kleinschreibung, Ziffern und Bindestrich -- mehr wird hier nicht gebraucht."""
+        """Text tippen -- auch Grossbuchstaben und Sonderzeichen.
+
+        Frueher wurden nur Kleinbuchstaben, Ziffern und der Bindestrich
+        gesendet. Grossbuchstaben kamen dadurch GAR NICHT an: im Installer
+        blieb das Feld "Vor- und Nachname" leer (der Cursor blinkte, es
+        passierte nichts), und beim Tippen von Befehlen entstand
+        Buchstabensalat. Was fehlt, wird jetzt ueber Shift gesendet.
+        """
+        # Zeichen, die ohne Shift auf einer eigenen Taste liegen
+        direkt = {
+            "/": "slash", ".": "dot", ",": "comma", "-": "minus",
+            "=": "equal", ";": "semicolon", "'": "apostrophe",
+            "[": "bracket_left", "]": "bracket_right", "\\": "backslash",
+            "`": "grave_accent",
+        }
+        # Zeichen, die mit Shift getippt werden
+        mit_shift = {
+            "_": "minus", ":": "semicolon", '"': "apostrophe",
+            "|": "backslash", ">": "dot", "<": "comma", "?": "slash",
+            "+": "equal", "~": "grave_accent",
+            "!": "1", "@": "2", "#": "3", "$": "4", "%": "5",
+            "^": "6", "&": "7", "*": "8", "(": "9", ")": "0",
+        }
+
         for zeichen in text:
-            code = "minus" if zeichen == "-" else ("spc" if zeichen == " " else zeichen)
+            if zeichen == " ":
+                tasten = ["spc"]
+            elif zeichen in direkt:
+                tasten = [direkt[zeichen]]
+            elif zeichen in mit_shift:
+                tasten = ["shift", mit_shift[zeichen]]
+            elif zeichen.isalpha() and zeichen.isupper():
+                tasten = ["shift", zeichen.lower()]
+            else:
+                tasten = [zeichen]          # Kleinbuchstaben und Ziffern
+
             self._sende({"execute": "send-key",
-                         "arguments": {"keys": [{"type": "qcode", "data": code}]}})
+                         "arguments": {"keys": [{"type": "qcode", "data": c}
+                                                for c in tasten]}})
             time.sleep(0.06)
 
     def bild(self, pfad):
