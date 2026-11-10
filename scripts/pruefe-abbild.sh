@@ -73,7 +73,11 @@ pruefe() {          # pruefe <beschreibung> <pfad im Abbild> [muster]
 }
 
 pruefe_nicht() {    # pruefe_nicht <beschreibung> <pfad im Abbild> <muster>
-	if unsquashfs -cat /tmp/p/fs "$2" 2>/dev/null | grep -q "$3"; then
+	# Kommentarzeilen ausblenden. Die Datei erklaert in ihren Kommentaren
+	# genau den Fehler, den diese Pruefung sucht ("sysfs: Unknown parameter
+	# 'nodiscard'") -- eine Suche ueber den ganzen Text schlaegt deshalb
+	# immer an und meldet falschen Alarm.
+	if unsquashfs -cat /tmp/p/fs "$2" 2>/dev/null | grep -v '^[[:space:]]*#' | grep -q "$3"; then
 		echo "    ✗ $1 -- \"$3\" steht in $2"; fehlt=1
 	else
 		echo "    ✓ $1"
