@@ -110,6 +110,29 @@ mehr da ist. Das hat nacheinander zu drei Abbrüchen geführt:
 
 Deshalb räumt `--refresh` auch die Sperre und die Paketliste im Chroot weg.
 
+### Pakete entfernen: `--frisch`
+
+**`--refresh` entfernt keine Pakete.** live-build installiert nur, was in den
+Listen steht — es *deinstalliert* nichts. Wer also ein Paket aus einer Liste
+streicht und mit `--refresh` baut, bekommt es weiterhin im Image, weil es im
+Chroot des Arbeitsvolumes noch installiert ist.
+
+```bash
+./scripts/container/build.sh --frisch
+```
+
+`--frisch` wirft `chroot/` und `.build/` weg und baut den Chroot neu auf; der
+Paketcache unter `cache/` (2369 Pakete, 2,5 GB) bleibt erhalten, deshalb dauert
+es nur wenige Minuten länger als ein `--refresh`. Auch die zwischengespeicherte
+Inhaltsliste `cache/contents.*` wird gelöscht — sie beschreibt sonst den alten
+Chroot, und `/live/filesystem.packages` im Image würde falsche Pakete auflisten.
+
+| Änderung | Richtiger Schalter |
+|---|---|
+| Includes, Hooks, Branding, Skripte | `--refresh` |
+| Paket **hinzugefügt** | `--refresh` |
+| Paket **entfernt** | `--frisch` |
+
 **Erwartung dämpfen:** live-build räumt die Marker der Chroot-Stufe nach einem
 erfolgreichen Bau selbst weg. Nach einem *abgeschlossenen* Bau findet
 `--refresh` also nichts mehr zum Wiederverwenden und die Paketinstallation

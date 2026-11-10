@@ -4,6 +4,7 @@
 #   ./scripts/container/build.sh            # frisch bauen
 #   ./scripts/container/build.sh --keep     # Arbeitsvolume behalten (2. Lauf schneller)
 #   ./scripts/container/build.sh --refresh  # Volume behalten, geaenderte Stufen neu laufen lassen
+#   ./scripts/container/build.sh --frisch   # Chroot neu aufbauen, Paketcache behalten
 #   ./scripts/container/build.sh --shell    # nur eine Shell im Container
 #   ./scripts/container/build.sh --clean    # Arbeitsvolume wegwerfen
 #
@@ -12,6 +13,12 @@
 # nur nach einem ABGEBROCHENEN Bau -- nach einem erfolgreichen raeumt live-build
 # seine Marker selbst weg. Der Paketcache bleibt in jedem Fall liegen, es wird
 # also nichts erneut heruntergeladen.
+#
+# --frisch ist noetig, wenn PAKETE ENTFERNT wurden. live-build installiert nur,
+# was in den Listen steht, und entfernt nichts -- ein --refresh haette die
+# gestrichenen Pakete also im Image gelassen. --frisch wirft chroot/ und .build/
+# weg und baut den Chroot neu; der Paketcache unter cache/ bleibt, deshalb
+# kostet das nur wenige Minuten mehr als ein --refresh.
 #
 # Voraussetzung: docker mit laufendem Daemon. Bei Docker Desktop startet man ihn
 # ohne root mit:  systemctl --user start docker-desktop
@@ -71,7 +78,7 @@ printf '%s\n' "$(cat CODENAME)" > config/includes.chroot/etc/rsos-codename
 
 # Frischer Lauf: altes Arbeitsvolume wegwerfen, sonst schleppt der Bau Reste
 # des letzten Versuchs mit. Mit --keep und --refresh bleibt es erhalten.
-if [ "${1:-}" = "--keep" ] || [ "${1:-}" = "--refresh" ]; then
+if [ "${1:-}" = "--keep" ] || [ "${1:-}" = "--refresh" ] || [ "${1:-}" = "--frisch" ]; then
 	[ -n "$("$ENGINE" volume ls -q -f "name=^${VOL}$")" ] || "$ENGINE" volume create "$VOL" >/dev/null
 else
 	"$ENGINE" volume rm "$VOL" >/dev/null 2>&1 || true
@@ -94,11 +101,24 @@ echo "==> Quellen ins Arbeitsvolume kopieren"
 # Datei .lock im Projektwurzelverzeichnis an und raeumt sie beim Abbruch nicht
 # weg. Bei einem frischen Volume kann das nicht passieren, bei --keep und
 # --refresh schon.
-if [ "${1:-}" = "--keep" ] || [ "${1:-}" = "--refresh" ]; then
+if [ "${1:-}" = "--keep" ] || [ "${1:-}" = "--refresh" ] || [ "${1:-}" = "--frisch" ]; then
 	if [ -n "$("$ENGINE" run --rm -v "$VOL":/work "$IMAGE" /bin/sh -c 'ls /work/.lock 2>/dev/null')" ]; then
 		echo "==> Sperre aus einem abgebrochenen Lauf entfernen (/work/.lock)"
 		"$ENGINE" run --rm -v "$VOL":/work "$IMAGE" /bin/sh -c 'rm -f /work/.lock'
 	fi
+fi
+
+# --frisch: Chroot und Marker wegwerfen, aber cache/ behalten. Noetig, wenn
+# Pakete ENTFERNT wurden -- siehe oben in der Uebersicht.
+if [ "${1:-}" = "--frisch" ]; then
+	echo "==> Chroot und Marker wegwerfen (Paketcache bleibt)"
+	"$ENGINE" run --rm --privileged -v "$VOL":/work "$IMAGE" /bin/sh -c '
+		rm -rf /work/chroot /work/.build /work/.lock /work/binary /work/out
+		rm -f /work/*.iso /work/build.log /work/*.log
+		# Die Inhaltsliste ("contents") beschreibt den alten Chroot; bleibt sie
+		# liegen, listet /live/filesystem.packages spaeter falsche Pakete.
+		rm -f /work/cache/contents.*
+		echo "Paketcache: $(find /work/cache -name "*.deb" 2>/dev/null | wc -l) Pakete"'
 fi
 
 # --refresh: die Stufen zuruecksetzen, die von geaenderten Paketlisten,
