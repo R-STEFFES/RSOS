@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=RSOS Standard-Wandbild
+Name[de]=RSOS Standard-Wandbild
+Comment=Setzt beim ersten Anmelden das Weltraum-Wandbild
+Comment[de]=Setzt beim ersten Anmelden das Weltraum-Wandbild
+Exec=/usr/lib/rsos/wandbild-setzen.sh
+OnlyShowIn=KDE;
+# Nach der Arbeitsflaeche starten, damit plasma-apply-wallpaperimage wirken kann
+X-KDE-autostart-after=panel
+# Nicht im Autostart-Verzeichnis der Systemeinstellungen anzeigen
+NoDisplay=true
