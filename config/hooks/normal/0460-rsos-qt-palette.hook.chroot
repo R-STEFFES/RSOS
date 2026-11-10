@@ -1,0 +1,38 @@
+#!/bin/sh
+# RSOS 2.0 -- Qt-Programme sollen der KDE-Farbpalette folgen
+#
+# WARUM
+# -----
+# Die Qt-Plattform-Anbindung an KDE (KDEPlasmaPlatformTheme6.so) ist installiert,
+# wird aber nur benutzt, wenn QT_QPA_PLATFORMTHEME gesetzt ist. Fehlt die
+# Variable, bekommt jedes Qt-Programm die helle Standardpalette von Qt --
+# unabhaengig davon, wie dunkel das System eingestellt ist.
+#
+# Sichtbar wurde das im Installer (er ist ein Qt-Programm):
+#   * Partitionierungsseite: der Viewport der Bildlaufflaeche war fast weiss
+#   * Zusammenfassungsseite: die Textkaesten werden mit
+#     palette().window().lighter(108) gefaerbt -- bei heller Palette also noch
+#     heller, und die Schrift darauf ist weiss
+# In beiden Faellen half kein Stylesheet, weil die Farbe aus der Palette kommt.
+#
+# /etc/environment wird von PAM bei der Anmeldung gelesen, gilt also fuer die
+# ganze Sitzung -- auch fuer Programme, die der Starter oder KRunner aufruft.
+
+set -e
+
+UMGEBUNG=/etc/environment
+
+if [ -f "${UMGEBUNG}" ] && grep -q "^QT_QPA_PLATFORMTHEME=" "${UMGEBUNG}"; then
+	exit 0
+fi
+
+mkdir -p "$(dirname "${UMGEBUNG}")"
+{
+	echo ""
+	echo "# RSOS: Qt-Programme holen ihre Farben aus der kdeglobals."
+	echo "# Ohne diese Zeile gilt Qts helle Standardpalette -- der Installer"
+	echo "# zeigte dadurch helle Flaechen mit heller Schrift."
+	echo "QT_QPA_PLATFORMTHEME=kde"
+} >> "${UMGEBUNG}"
+
+echo "QT_QPA_PLATFORMTHEME=kde in ${UMGEBUNG} eingetragen"
