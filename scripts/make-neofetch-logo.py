@@ -18,6 +18,13 @@ HIER = Path(__file__).resolve().parent.parent
 QUELLE = HIER / "assets/brand/monogram_white.png"
 ZIEL = HIER / "config/includes.chroot/etc/fastfetch/sti-ascii.txt"
 
+# Zwei Ausgabeformate, weil sich die Programme unterscheiden:
+#   fastfetch  versteht ANSI-Escapesequenzen im Bild
+#   neofetch   erwartet Platzhalter der Form ${c1} und ersetzt sie selbst
+#              (siehe get_distro_ascii/print_ascii im Skript)
+ZIEL_NEOFETCH = HIER / "config/includes.chroot/usr/share/neofetch/ascii-rsos.txt"
+NEOFETCH_FARBE = "${c1}"
+
 # Breite in Textzeichen. Jedes Zeichen deckt 2 Bildzeilen ab.
 ZEICHEN_BREITE = 64
 # Schwellwert auf dem Alphakanal: ab hier gilt ein Bildpunkt als "Logo".
@@ -86,12 +93,18 @@ def main():
         zeilen.pop()
 
     inhalt = "\n".join(f"{CYAN}{z}{ENDE}" if z.strip() else "" for z in zeilen)
-
     ziel.parent.mkdir(parents=True, exist_ok=True)
     ziel.write_text(inhalt + "\n", encoding="utf-8")
+    print(f"geschrieben: {ziel}  (fastfetch, ANSI-Farben)")
 
-    print(f"geschrieben: {ziel}")
-    print(f"{len(zeilen)} Zeilen, {ZEICHEN_BREITE} Zeichen breit")
+    # Dieselbe Grafik fuer neofetch: jede Zeile bekommt den Platzhalter voran,
+    # den neofetch selbst durch die Farbe ersetzt.
+    neofetch = "\n".join(f"{NEOFETCH_FARBE}{z}" if z.strip() else "" for z in zeilen)
+    ZIEL_NEOFETCH.parent.mkdir(parents=True, exist_ok=True)
+    ZIEL_NEOFETCH.write_text(neofetch + "\n", encoding="utf-8")
+    print(f"geschrieben: {ZIEL_NEOFETCH}  (neofetch, Platzhalter {NEOFETCH_FARBE})")
+
+    print(f"{len(zeilen)} Zeilen, ZEICHEN_BREITE Zeichen breit".replace("ZEICHEN_BREITE", str(ZEICHEN_BREITE)))
     print()
     for z in zeilen:
         print(z)

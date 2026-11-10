@@ -112,30 +112,62 @@ Zwei Fallstricke, die dabei aufgetreten sind:
   quadratische Fläche mit Rand gesetzt werden, sonst sitzt die Marke schief im
   Symbol.
 
-## Systemübersicht: fastfetch
+## Systemübersicht: neofetch (und fastfetch)
 
-`fastfetch` zeigt beim Start im Terminal die Systemübersicht mit der
-RSOS-Bildmarke als Blockgrafik.
+Im Terminal zeigt die Systemübersicht die RSOS-Bildmarke als Blockgrafik —
+bei `neofetch` wie bei `fastfetch`.
 
-**Warum nicht neofetch:** Raphael wünschte neofetch. Das Projekt wurde 2024
-eingestellt und ist aus dem Debian-Archiv entfernt — in trixie liefert
-`apt-cache policy neofetch` keinen Kandidaten mehr. `fastfetch` ist der
-gepflegte Nachfolger und kann dasselbe.
+**neofetch oder fastfetch?** Raphael wollte neofetch. Das Programm wurde 2024
+eingestellt und ist aus dem Debian-Archiv **entfernt** — in trixie liefert
+`apt-cache policy neofetch` keinen Kandidaten mehr. Es kommt deshalb als
+Programm aus dem letzten Debian-Paket (7.1.0-4 aus Debian 12) ins Image:
+
+```bash
+sh scripts/fetch-neofetch.sh     # lädt, prüft die Prüfsumme, ergänzt die Marke
+```
+
+Das Skript legt `config/includes.chroot/usr/bin/neofetch` ab. Damit kommt
+**keine zusätzliche Paketquelle** ins Image — die Datei liegt fest im
+Repository, der Bau braucht kein Netz. Zusätzlich bleibt `fastfetch` als
+gepflegte Alternative installiert.
 
 | Datei | Zweck |
 |---|---|
-| `etc/fastfetch/config.jsonc` | Systemvorgabe: Blockgrafik, deutsche Beschriftungen, Cyan als Schlüsselfarbe |
-| `etc/fastfetch/sti-ascii.txt` | die Bildmarke als Blockgrafik |
-| `scripts/make-neofetch-logo.py` | erzeugt die Blockgrafik neu |
+| `usr/bin/neofetch` | neofetch 7.1.0 mit einem zusätzlichen Fall `"RSOS"` in `get_distro_ascii()` |
+| `usr/share/neofetch/ascii-rsos.txt` | die Bildmarke als Blockgrafik, mit neofetch-Platzhaltern `${c1}` |
+| `etc/fastfetch/config.jsonc` | Systemvorgabe für fastfetch: Blockgrafik, deutsche Beschriftungen, Cyan |
+| `etc/fastfetch/sti-ascii.txt` | dieselbe Grafik für fastfetch, mit ANSI-Farben |
+| `scripts/make-neofetch-logo.py` | erzeugt beide Grafiken neu |
 
 Die Blockgrafik wird **nicht von Hand gezeichnet**, sondern abgetastet: das
 Skript liest den Alphakanal der Bildmarke, verkleinert ihn auf 64 Zeichen Breite
 und setzt je zwei Bildzeilen in ein Blockzeichen um (`▀ ▄ █`). Dadurch stimmt
 die Form.
 
-Der Systemname in der Ausgabe kommt aus `/etc/os-release` — dort steht
-`PRETTY_NAME="RSOS 2.0 Janina"`, und genau das zeigt fastfetch an. Ohne diese
-Zeile stünde dort „Debian GNU/Linux 13".
+**Der Systemname** kommt in beiden Programmen aus `/etc/os-release` — dort steht
+`PRETTY_NAME="RSOS 2.0 Janina"`, und genau das wird angezeigt. Ohne diese Zeile
+stünde dort „Debian GNU/Linux 13".
+
+**Warum neofetch die Marke findet, ohne dass etwas eingestellt wird:** neofetch
+setzt `ascii_distro` aus `NAME=` der `os-release`, hier also `RSOS`. Der
+ergänzte Fall `"RSOS"*)` greift damit von allein. Die Farben (`set_colors 6 7`)
+setzen Cyan und Weiß; die Platzhalter `${c1}`/`${c2}` in der Grafik füllt
+neofetch selbst.
+
+## Dunkles Farbschema
+
+Raphael wollte ein dunkles System. Gesetzt wird es in
+`config/hooks/normal/0400-rsos-plasma.hook.chroot`:
+
+| Datei | Eintrag | Wirkung |
+|---|---|---|
+| `/etc/skel/.config/kdeglobals` | `ColorScheme=BreezeDark` | neue Konten |
+| `/etc/skel/.config/kdeglobals` | `LookAndFeelPackage=org.kde.breezedark.desktop` | Fenster, Leisten, Menüs |
+| `/etc/xdg/kdeglobals` | dieselben Werte | auch für Konten ohne eigenen Eintrag (etwa den Live-Benutzer) |
+
+`Breeze` (ohne Zusatz) ist die **helle** Fassung — die stand dort vorher.
+Vorhanden sind beide: `/usr/share/color-schemes/BreezeDark.colors` und
+`/usr/share/plasma/look-and-feel/org.kde.breezedark.desktop`.
 
 ## Was wohin gehört
 

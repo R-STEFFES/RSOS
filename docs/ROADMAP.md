@@ -29,15 +29,28 @@ jemandem in die Hand drücken kann, ohne 40 Anwendungen zu erklären.
 ## Was drin ist
 
 * Plasma mit Dolphin, Konsole, Kate, Ark, Gwenview, Okular, Spectacle, KCalc
-* Firefox ESR (deutsch), Thunderbird (deutsch)
-* LibreOffice: Writer, Calc, Impress, Draw
-* Multimedia: MPV, Audacious, Kdenlive, GIMP, Inkscape, SoundConverter
+* Firefox ESR (deutsch)
+* Multimedia: Audacious, FFmpeg, die GStreamer-Sätze, SoundConverter, SoX
 * Luanti (Blockwelt)
 * Netz: NetworkManager, OpenVPN, Remmina, FileZilla, SMB
 * Datenträger: GParted, cryptsetup, NTFS/exFAT/Btrfs/XFS, BleachBit
-* Sicherheit: KeePassXC mit Browser-Anbindung
 * Drucken und Scannen: CUPS, Gutenprint, Simple Scan
 * Firmware: der komplette Satz der 1.x-Reihe (WLAN, Grafik, Sound)
+* Systemübersicht: neofetch mit der RSOS-Bildmarke als Blockgrafik und
+  fastfetch als Alternative
+
+## Was Raphael am 2026-11-10 gestrichen hat
+
+* Büro: LibreOffice (Writer, Calc, Impress, Draw)
+* Mail: Thunderbird
+* Videoschnitt: Kdenlive
+* Medienwiedergabe: MPV
+* Grafik: Inkscape, ImageMagick
+* Sicherheit: KeePassXC samt Browser-Anbindung
+
+Diese Pakete stehen in keiner Liste mehr; die Begründung steht als Kommentar in
+`config/package-lists/20-apps.list.chroot`, damit sie nicht versehentlich wieder
+auftauchen.
 
 ## Was nicht mehr drin ist
 

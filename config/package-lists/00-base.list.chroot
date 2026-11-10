@@ -44,6 +44,13 @@ fonts-dejavu-core
 grub-common
 grub-efi-amd64-bin
 grub-pc-bin
+# grub2-common liefert /usr/sbin/grub-install und /usr/sbin/update-grub. OHNE
+# dieses Paket bricht der Bootloader-Schritt des Installers mit "grub-install
+# fehlt" ab -- grub-common, grub-pc-bin und grub-efi-amd64-bin bringen es
+# naemlich nicht mit. Es war nur deshalb im Image, weil es als Abhaengigkeit
+# von grub-pc mitkam; seit grub-pc wegen des Konflikts mit grub-efi entfallen
+# ist, muss es ausdruecklich hier stehen.
+grub2-common
 isolinux
 isomd5sum
 librsvg2-bin
@@ -145,10 +152,6 @@ cups-filters
 foomatic-db
 printer-driver-gutenprint
 simple-scan
-
-# --- Sicherheit ------------------------------------------------------------
-keepassxc
-webext-keepassxc-browser
 
 # --- Kleinkram, den man im Terminal erwartet -------------------------------
 htop

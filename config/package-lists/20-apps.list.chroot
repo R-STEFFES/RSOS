@@ -3,20 +3,11 @@
 # Der Anwendungsblock der 1.x-Reihe, auf KDE umgestellt und ausgeduennt:
 # ein Browser, eine Buerosuite, Multimedia, ein Spiel. Nichts doppelt.
 
-# --- Internet und Buerosuite -----------------------------------------------
+# --- Internet ---------------------------------------------------------------
 firefox-esr
 firefox-esr-l10n-de
-libreoffice-calc
-libreoffice-draw
-libreoffice-impress
-libreoffice-writer
-libreoffice-gtk3
-libreoffice-l10n-de
-libreoffice-style-breeze
 hunspell-de-de
 mythes-de
-thunderbird
-thunderbird-l10n-de
 
 # --- Multimedia ------------------------------------------------------------
 audacious
@@ -27,15 +18,30 @@ gstreamer1.0-plugins-bad
 gstreamer1.0-plugins-good
 gstreamer1.0-plugins-ugly
 lame
-mpv
 soundconverter
 sox
-kdenlive
 
 # --- Grafik ----------------------------------------------------------------
 gimp
-imagemagick
-inkscape
+
+# --- Auf Wunsch von Raphael entfernt (2026-11-10) --------------------------
+# Diese Pakete standen hier und sollen NICHT wieder aufgenommen werden:
+#
+#   libreoffice-calc, -draw, -impress, -writer, -gtk3, -l10n-de,
+#   -style-breeze      Buerosuite
+#   thunderbird, thunderbird-l10n-de        Mailprogramm
+#   kdenlive           Videoschnitt
+#   mpv                Medienwiedergabe
+#   inkscape, imagemagick                   Grafikwerkzeuge
+#   keepassxc, webext-keepassxc-browser     (standen in 00-base)
+#
+# Was zum Abspielen und Umwandeln gebraucht wird, bleibt: audacious, ffmpeg,
+# die GStreamer-Saetze, lame, soundconverter, sox.
+#
+# Achtung bei imagemagick: der Plasma-Hook (0400-rsos-plasma.hook.chroot)
+# erzeugt damit ein Vorschaubild fuer das Wandbildpaket. Der Aufruf ist
+# abgesichert und wird ohne ImageMagick einfach uebersprungen -- das Wandbild
+# selbst erscheint trotzdem, nur ohne Vorschaubild in den Systemeinstellungen.
 
 # --- Spiele und Freizeit ---------------------------------------------------
 luanti

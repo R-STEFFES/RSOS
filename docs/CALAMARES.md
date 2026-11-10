@@ -112,6 +112,44 @@ niedrig aufgelöst, 318×35).
 Farben: Grund `#0C0C0C`, Akzent `#00E5FF`, Speed-Slash als dünne Cyan-Linie mit
 Lücke um die Wortmarke.
 
+## Schrift und Grund der Inhaltsflächen
+
+Raphael: „Mach die Schrift in dem Installer weiß und nicht schwarz."
+
+Der Zusammenhang, der dabei wichtig ist — aus der Beschreibung im
+Calamares-Beispiel-Branding:
+
+> `productWallpaper` … will **replace the normal solid background on every page**
+> of the application. It can be any size and proportion, and **will be tiled** to
+> fit the entire window.
+
+Das Wandbild liegt also **hinter** den Seiten. Eine deckende Farbe auf `#mainApp`
+verdeckt es — und genau das stand vorher im Stylesheet (weiß auf `#FAFAF8`, Text
+schwarz). Ergebnis: weißer Inhalt, kein Bild, schwarze Schrift.
+
+Jetzt gilt in `stylesheet.qss`:
+
+| Element | Wert |
+|---|---|
+| `#mainApp` | `background: transparent` — das Bild scheint durch |
+| Schrift | `#FAFAF8` (hell) |
+| Eingabefelder, Knöpfe, Listen | halbdurchsichtiges Dunkel `rgba(12,12,12,0.72)` mit hellem Text |
+| Akzent | Cyan `#00E5FF`, bei Knöpfen als Hover und in der Fortschrittsanzeige |
+
+**Nicht** über QSS erreichbar: die Schrittliste links. Sie hat einen eigenen
+C++-Delegate; ihre Farben kommen ausschließlich aus den `style:`-Werten in
+`branding.desc`.
+
+> **Kachelung:** Calamares kachelt Bilder, die nicht fenstergroß sind
+> (`windowSize: 900px,620px`). Angezeigt wird Raphaels Bild unverändert
+> (`wallpaper.png`, 1920×1080). Daneben liegt die auf Fenstergröße gebrachte
+> Fassung `wallpaper-fenster.png` (900×620, mittig beschnitten) — sie lässt sich
+> in `branding.desc` mit einer Zeile umstellen:
+>
+> ```yaml
+>     productWallpaper:    "wallpaper-fenster.png"
+> ```
+
 ## Bootloader-Schritt: der `sed`-Fehler bei `/etc/default/grub`
 
 **Meldung während der Installation:**

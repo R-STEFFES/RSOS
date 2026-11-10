@@ -66,22 +66,25 @@ if [ -e /usr/share/backgrounds/rsos/Poly1-STI.png ]; then
 	fi
 fi
 
-# --- Symbole: Bildmarke als Startzeichen ------------------------------------
-# Das Startzeichen des KDE-Anwendungsstarters kommt aus dem Symbolthema, nicht
-# aus dem Panel-Layout (siehe 0450-rsos-icons.hook.chroot). Das Thema "RSOS"
-# erbt Breeze und belegt dort nur start-here-kde-symbolic mit der Bildmarke.
+# --- Dunkles Farbschema -----------------------------------------------------
+# Raphael wollte ein dunkles System. BreezeDark faerbt Fenster, Leisten, Menues
+# und den Sperrbildschirm dunkel mit hellem Text; das Farbschema "Breeze" (ohne
+# Zusatz) ist die helle Fassung.
+#
 # Als Vorgabe fuer neue Nutzer hier, zusaetzlich systemweit in /etc/xdg.
+# Vorsicht beim Abziehen des Plasma-Layouts: capture-kde-config.sh kopiert
+# kdeglobals vom Testrechner -- Farbschema und Symbolthema danach pruefen.
 mkdir -p /etc/skel/.config
 cat > /etc/skel/.config/kdeglobals <<'EOF'
 [General]
-ColorScheme=Breeze
+ColorScheme=BreezeDark
 Name=RSOS
 
 [Icons]
 Theme=RSOS
 
 [KDE]
-LookAndFeelPackage=org.kde.breeze.desktop
+LookAndFeelPackage=org.kde.breezedark.desktop
 SingleClick=false
 widgetStyle=Breeze
 
@@ -91,11 +94,17 @@ Language=de_DE
 MeasureSystem=1
 EOF
 
-# Systemweite Vorgabe: greift auch fuer Konten, deren kdeglobals den Eintrag
+# Systemweite Vorgabe: greift auch fuer Konten, deren kdeglobals die Eintraege
 # nicht enthaelt (etwa den Live-Benutzer, falls /etc/skel nicht kopiert wurde).
 cat > /etc/xdg/kdeglobals <<'EOF'
+[General]
+ColorScheme=BreezeDark
+
 [Icons]
 Theme=RSOS
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
 EOF
 
 # --- Baloo (Dateiindex) im Live-Betrieb nicht noetig, spart Plattenlast ----
