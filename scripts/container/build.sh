@@ -150,6 +150,15 @@ if [ "${1:-}" = "--refresh" ]; then
 		echo "zurueckgesetzt: $(ls | tr "\n" " ")"'
 fi
 
+# Ueberbleibsel aus abgebrochenen Laeufen: eine alte Squashfs im Chroot wird
+# sonst mit ins neue Abbild gepackt. Genau das ist passiert -- die ISO wuchs von
+# 2,9 auf 5,1 GB, ohne dass ein Paket dazukam (in der Chroot lagen 2,2 GB
+# filesystem.squashfs aus einem frueheren Lauf).
+if [ -n "$("$ENGINE" run --rm -v "$VOL":/work "$IMAGE" /bin/sh -c 'ls /work/chroot/*.squashfs 2>/dev/null')" ]; then
+	echo "==> Ueberbleibsel im Chroot entfernen (alte Squashfs)"
+	"$ENGINE" run --rm -v "$VOL":/work "$IMAGE" /bin/sh -c 'rm -f /work/chroot/*.squashfs'
+fi
+
 echo "==> Build im Volume -- das dauert 25 bis 45 Minuten"
 if [ -n "${RSOS_SQUASHFS:-}" ]; then
 	echo "    Squashfs-Kompression: ${RSOS_SQUASHFS} (Vorgabe waere xz)"
@@ -180,6 +189,20 @@ fi
 echo
 echo "Fertig. ISO(s) in ${PROJECT}/out/"
 ls -lh out/ 2>/dev/null || true
+
+# Groessenkontrolle. Eine unerwartet grosse ISO heisst fast immer, dass
+# Ueberbleibsel mitgepackt wurden -- bisher zweimal passiert (alte Squashfs in
+# der Chroot). Lieber einmal zu viel nachsehen als eine kaputte ISO ausliefern.
+for f in out/*.iso; do
+	[ -e "$f" ] || continue
+	MB=$(du -m "$f" | cut -f1)
+	if [ "$MB" -gt 3500 ]; then
+		echo >&2
+		echo "WARNUNG: $(basename "$f") ist ${MB} MB gross, erwartet werden etwa 2900 MB." >&2
+		echo "Nachsehen, was gross ist:" >&2
+		echo "  $ENGINE run --rm -v $VOL:/work $IMAGE sh -c 'du -sh /work/chroot; find /work/chroot -xdev -size +100M -printf \"%s %p\\n\"'" >&2
+	fi
+done
 
 # Zusaetzlich nach ~/Downloads -- dort liegen die anderen Testimages.
 if [ -d "${HOME}/Downloads" ]; then
