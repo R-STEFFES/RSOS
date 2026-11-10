@@ -99,6 +99,21 @@
     color: #0C0C0C;
 }
 
+/* --- Bildlaufflächen (Partitionsseite) -----------------------------------
+ * WICHTIG: Der Viewport einer QScrollArea ist ein eigenes Kindfenster und wird
+ * von der Regel für das Elternelement NICHT erfasst -- er nimmt seine Farbe aus
+ * der Palette. Genau dieser Bereich war auf der Partitionierungsseite fast
+ * weiss: die beiden Auswahlpunkte "Festplatte loeschen" und "Manuelle
+ * Partitionierung" standen in weisser Schrift darauf. Im laufenden Installer
+ * (kopfloser QEMU-Lauf, Bildschirmfoto) nachgesehen.
+ */
+#mainApp QScrollArea > QWidget#qt_scrollarea_viewport,
+#mainApp QAbstractScrollArea > QWidget#qt_scrollarea_viewport,
+#mainApp QScrollArea QWidget#qt_scrollarea_viewport > QWidget {
+    background-color: rgba(12, 12, 12, 0.72);
+    color: #FAFAF8;
+}
+
 /* --- Schaltflaechen ------------------------------------------------------ */
 #mainApp QPushButton {
     background-color: rgba(12, 12, 12, 0.72);
